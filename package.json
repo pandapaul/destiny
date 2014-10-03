@@ -1,0 +1,17 @@
+{
+  "name": "dppg",
+  "subdomain": "dppg",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "version": "0.0.1-1",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "dependencies": {
+    "express": "4.9.5",
+    "slimerjs": "0.9.1-2",
+    "path": "0.4.9",
+    "body-parser": "1.9.0"
+  }
+}
