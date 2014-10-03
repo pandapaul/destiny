@@ -2,6 +2,7 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		pic = $('#pic'),
+		selectedAccountType = 2,
 		errUnableToConnectToBungie = {msg:'unable to connect to Bungie'},
 		errNoResponseFromBungie = {msg:'no response from Bungie'},
 		errNoMatchesFound = {msg:'no matches found'},
@@ -82,6 +83,7 @@ $(function() {
 
 	function requireAccountSelection(res) {
 		console.log('require account selection');
+
 	}
 
 	function retrievePic(character) {
@@ -121,28 +123,34 @@ $(function() {
 				showError();
 				return;
 			}
-			if(res.length === 1) {
-				getCharacterIds(res[0])
-				.done(function(res) {
-					if(res.data.characters.length === 1) {
-						retrievePic(res.data.characters[0].characterBase);
-					} else {
-						requireCharacterSelection(res);
-						button.attr('disabled',false);
-					}
-				})
-				.fail(function(res) {
-					showError(res);
-					button.attr('disabled',false);
-				});
-			} else {
-				requireAccountSelection(res);
-				button.attr('disabled',false);
+			var member = {};
+			for(var i=0;i<res.length;i++) {
+				if(res[i].membershipType === selectedAccountType) {
+					member = res[i];
+					break;
+				}
 			}
+			getCharacterIds(member)
+			.done(function(res) {
+				if(res.data.characters.length === 1) {
+					retrievePic(res.data.characters[0].characterBase);
+				} else {
+					requireCharacterSelection(res);
+					button.attr('disabled',false);
+				}
+			})
+			.fail(function(res) {
+				showError(res);
+				button.attr('disabled',false);
+			});
 		})
 		.fail(function(res){
 			showError(res);
 			button.attr('disabled',false);
 		});
+	});
+
+	$("input:radio[name=accountType]").click(function() {
+    	selectedAccountType = $(this).val();
 	});
 });
