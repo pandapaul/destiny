@@ -81,9 +81,8 @@ $(function() {
 		return dfd;
 	}
 
-	function requireAccountSelection(res) {
-		console.log('require account selection');
-
+	function requireCharacterSelection(res) {
+		console.log('require character selection');
 	}
 
 	function retrievePic(character) {
@@ -135,8 +134,8 @@ $(function() {
 				if(res.data.characters.length === 1) {
 					retrievePic(res.data.characters[0].characterBase);
 				} else {
-					requireCharacterSelection(res);
-					button.attr('disabled',false);
+					retrievePic(res.data.characters[0].characterBase);
+					// TODO requireCharacterSelection(res);
 				}
 			})
 			.fail(function(res) {
@@ -151,6 +150,6 @@ $(function() {
 	});
 
 	$("input:radio[name=accountType]").click(function() {
-    	selectedAccountType = $(this).val();
+    	selectedAccountType = parseInt($(this).val());
 	});
 });
