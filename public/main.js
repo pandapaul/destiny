@@ -1,7 +1,7 @@
 $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
-		pic = $('#pic'),
+		results = $('.results'),
 		selectedAccountType = 2,
 		errUnableToConnectToBungie = {msg:'unable to connect to Bungie'},
 		errNoResponseFromBungie = {msg:'no response from Bungie'},
@@ -88,6 +88,8 @@ $(function() {
 	function retrievePic(character) {
 		var url = 'http://www.bungie.net/en/Legend/' + character.membershipType + '/' + character.membershipId + '/' + character.characterId + '#gear';
 
+		results.hide();
+
 		$.ajax({
 			type: 'POST',
 			url: '/getPic',
@@ -99,8 +101,9 @@ $(function() {
 			if(!data.filename) {
 				return;
 			}
-			pic.attr('src', data.filename);
-			pic.show();
+			results.find('img').attr('src', data.filename);
+			results.find('a').html(url).attr('href', url);
+			results.show();
 		})
 		.fail(function() {
 			showError();
@@ -152,4 +155,11 @@ $(function() {
 	$("input:radio[name=accountType]").click(function() {
     	selectedAccountType = parseInt($(this).val());
 	});
+
+	textInput.on('keypress', function(e) {
+		if(e.keyCode === 13) {
+			button.click();
+		}
+	});
+
 });
