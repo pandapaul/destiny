@@ -42,4 +42,4 @@ app.post('/getPic', getPic);
 
 var listenPort = 8000;
 app.listen(listenPort);
-console.log('Log service listening on port ' + listenPort);
+console.log('Listening on port ' + listenPort);
