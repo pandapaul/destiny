@@ -2,11 +2,12 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		results = $('.results'),
+		message = $('.message'),
 		selectedAccountType = 2,
-		errUnableToConnectToBungie = {msg:'unable to connect to Bungie'},
-		errNoResponseFromBungie = {msg:'no response from Bungie'},
-		errNoMatchesFound = {msg:'no matches found'},
-		errNoCharactersFound = {msg:'no characters found'};
+		errUnableToConnectToBungie = {text:'unable to connect to Bungie'},
+		errNoResponseFromBungie = {text:'no response from Bungie'},
+		errNoMatchesFound = {text:'no matches found'},
+		errNoCharactersFound = {text:'no characters found'};
 
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
@@ -37,13 +38,31 @@ $(function() {
 		return dfd;
 	}
 
-	function showError(err) {
-		//TODO implement better error showing
-		if(err && err.msg) {
-			console.log('Error: ' + err.msg);
-		} else {
-			console.log('Unknown error');
+	function showMessage(msg) {
+		if(!msg) {
+			return;
 		}
+		if(typeof msg === 'string') {
+			msg = {text:msg};
+		}
+		if(msg.level === 'info') {
+			message.css('color','#000');
+		} else {
+			message.css('color','#a94442');
+		}
+		if(msg.text) {
+			message.text(msg.text);
+		} else {
+			message.text('unknown error');
+		}
+	}
+
+	function showError(err) {
+		if(typeof err === 'string') {
+			err = {text:err};
+		}
+		err.level = 'error';
+		showMessage(err);
 	}
 
 	function getCharacterIds(member) {
@@ -86,9 +105,7 @@ $(function() {
 	}
 
 	function retrievePic(character) {
-		var url = 'http://www.bungie.net/en/Legend/' + character.membershipType + '/' + character.membershipId + '/' + character.characterId + '#gear';
-
-		results.hide();
+		var url = 'http://www.bungie.net/en/Legend/' + character.membershipType + '/' + character.membershipId + '/' + character.characterId + '#gear';	
 
 		$.ajax({
 			type: 'POST',
@@ -104,6 +121,7 @@ $(function() {
 			results.find('img').attr('src', data.filename);
 			results.find('a').html(url).attr('href', url);
 			results.show();
+			message.empty();
 		})
 		.fail(function() {
 			showError();
@@ -118,7 +136,9 @@ $(function() {
 		if(!$.trim(username)) {
 			return;
 		}
+		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
+		results.hide();
 		searchForMembership(username)
 		.done(function(res){
 			if(!res || res.length < 1) {
