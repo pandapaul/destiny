@@ -7,7 +7,20 @@ $(function() {
 		errUnableToConnectToBungie = {text:'unable to connect to Bungie'},
 		errNoResponseFromBungie = {text:'no response from Bungie'},
 		errNoMatchesFound = {text:'no matches found'},
-		errNoCharactersFound = {text:'no characters found'};
+		errNoCharactersFound = {text:'no characters found'},
+		hashes = {
+			3159615086: 'glimmer',
+			1415355184: 'crucible marks',
+			1415355173: 'vanguard marks',
+			898834093: 'exo',
+			3887404748: 'human',
+			2803282938: 'awoken',
+			3111576190: 'male',
+			2204441813: 'female',
+			671679327: 'hunter',
+			3655393761: 'titan',
+			2271682572: 'warlock'
+		};
 
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
@@ -131,6 +144,46 @@ $(function() {
 		});
 	}
 
+	function getCurrency(characterBase) {
+		var dfd = new $.Deferred(),
+			accountType = 'TigerPSN';
+
+		if(characterBase.membershipType === 1) {
+			accountType = 'TigerXbox';
+		}
+
+		$.jsonp({
+			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory',
+			dataType:"jsonp",
+			success: function(data) {
+				if(data && data.Response && data.Response.data && data.Response.data.currencies && data.Response.data.currencies.length) {
+					return dfd.resolve(data.Response.data.currencies);
+				} else {
+					dfd.reject(errNoResponseFromBungie);
+				}
+			}
+		});
+		return dfd;
+	}
+
+	function showCurrency(character, isLastCharacter) {
+		getCurrency(character.characterBase)
+		.done(function (res) {
+			var d = $('<div/>').html('<span style="font-weight:bold;margin-right:10px">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</span>');
+			for(var i=0;i<res.length;i++) {
+				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
+			}
+			d.appendTo(results);
+		})
+		.always(function () {
+			if(isLastCharacter) {
+				results.show();
+				message.empty();
+				button.attr('disabled',false);
+			}
+		});
+	}
+
 	button.on('click', function() {
 		var username = textInput.val();
 		if(!$.trim(username)) {
@@ -138,7 +191,7 @@ $(function() {
 		}
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
-		results.hide();
+		results.empty();
 		searchForMembership(username)
 		.done(function(res){
 			if(!res || res.length < 1) {
@@ -154,11 +207,8 @@ $(function() {
 			}
 			getCharacterIds(member)
 			.done(function(res) {
-				if(res.data.characters.length === 1) {
-					retrievePic(res.data.characters[0].characterBase);
-				} else {
-					retrievePic(res.data.characters[0].characterBase);
-					// TODO requireCharacterSelection(res);
+				for(var i=0;i<res.data.characters.length;i++) {
+					showCurrency(res.data.characters[i], i===res.data.characters.length-1);
 				}
 			})
 			.fail(function(res) {
