@@ -40,6 +40,6 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 app.post('/getPic', getPic);
 
-var listenPort = 8000;
+var listenPort = process.env.PORT || 5000;
 app.listen(listenPort);
 console.log('Listening on port ' + listenPort);
