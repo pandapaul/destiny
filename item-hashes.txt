@@ -1,0 +1,16 @@
+item hashes
+
+3159615086 - glimmer
+1415355184 - crucible marks
+1415355173 - vanguard marks
+
+898834093 - exo race
+3887404748 - human race
+2803282938 - awoken race
+
+3111576190 - male gender
+2204441813 - female gender
+
+671679327 - hunter class
+3655393761 - titan class
+2271682572 - warlock class
