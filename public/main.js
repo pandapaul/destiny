@@ -59,9 +59,9 @@ $(function() {
 			msg = {text:msg};
 		}
 		if(msg.level === 'info') {
-			message.css('color','#000');
+			message.css('color','');
 		} else {
-			message.css('color','#a94442');
+			message.css('color','rgb(85, 127, 158)');
 		}
 		if(msg.text) {
 			message.text(msg.text);
@@ -169,7 +169,7 @@ $(function() {
 	function showCurrency(character, isLastCharacter) {
 		getCurrency(character.characterBase)
 		.done(function (res) {
-			var d = $('<div/>').html('<span style="font-weight:bold;margin-right:10px">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</span>');
+			var d = $('<div/>').html('<span class="character">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</span>');
 			for(var i=0;i<res.length;i++) {
 				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
 				if(i<res.length-1) {
