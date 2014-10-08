@@ -6,27 +6,36 @@
 	<script src="main.js"></script>
 	<script src="jsonproxy.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="container clearfix" style="width:500px;margin-top:20px">
-	<h3 style="margin-bottom:40px">Destiny currency search</h3>
-	<label id="fieldLabel" for="textInput">username</label><input type="text" id="textInput" name="textInput" class="pull-right" style="width:350px" placeholder="a destiny username"/>
+<div class="container title">
+	<h3>Destiny currency search</h3>
 </div>
-<div class="container" style="width:500px;margin-top:10px">
+
+<div class="container clearfix">
+	<label id="fieldLabel" for="textInput">username</label><input type="text" id="textInput" name="textInput" class="pull-right" placeholder="a destiny username"/>
+</div>
+<div class="container">
 	<div class="form-horizontal pull-right">
 		<label for="radio-psn" class="radio-inline"><input type="radio" id="radio-psn" name="accountType" value="2" checked/> psn</label>
 		<label for="radio-xbox" class="radio-inline"><input type="radio" id="radio-xbox" name="accountType" value="1"/> xbox</label>
 	</div>
 </div>
-<div class="container clearfix" style="width:500px;margin-top:10px">
+<div class="container clearfix">
 	<button id="submitButton" class="btn btn-default pull-right">Search</button>
-	<div class="message pull-right" style="margin-right:10px;margin-top:7px;"></div>
+	<div class="message pull-right"></div>
 </div>
 
-<div class="container-fluid results" style="text-align:center;margin-top:35px">
+<div class="container-fluid results">
 	
 </div>
 
+<div class="footer text-muted">
+	<div class="container">
+		by <a href="http://github.com/pandapaul">paul anderson</a>
+	</div>
+</div>
 </body>
 </html>

@@ -1,0 +1,32 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 60px;
+}
+.title {
+	margin-bottom: 40px;
+}
+.container {
+	width: 500px;
+	margin-top: 10px;
+}
+.message {
+	margin-right: 10px;
+	margin-top: 7px;
+}
+.results {
+	text-align: center;
+	margin-top: 35px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  text-align: right;
+}
+input[type=text] {
+	width: 350px;
+}
