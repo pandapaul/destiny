@@ -25,7 +25,7 @@ $(function() {
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
 		$.jsonp({
-			url: 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/All/' + username + '/',
+			url: 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
 			dataType:"jsonp",
 			success: function(data) {
 				if(data && data.Response) {
