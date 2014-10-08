@@ -61,7 +61,7 @@ $(function() {
 		if(msg.level === 'info') {
 			message.css('color','');
 		} else {
-			message.css('color','rgb(85, 127, 158)');
+			message.css('color','#a94442');
 		}
 		if(msg.text) {
 			message.text(msg.text);
@@ -234,5 +234,7 @@ $(function() {
 			button.click();
 		}
 	});
+
+	textInput.focus();
 
 });

@@ -3,18 +3,19 @@ html {
 	min-height: 100%;
 }
 body {
-	margin-top:100px;
+	margin-top:110px;
 	margin-bottom: 40px;
 	background: #222;
 	color: rgb(222, 222, 222);
+	font-size:18px;
 }
 .header {
 	position:absolute;
 	top:0;
-	height:44px;
+	height:60px;
 	width: 100%;
 	background-color: rgb(78, 50, 99);
-	font-size: 24px;
+	font-size: 32px;
 }
 .container {
 	width: 500px;
@@ -23,6 +24,7 @@ body {
 .message {
 	margin-right: 10px;
 	margin-top: 7px;
+	vertical-align: bottom;
 }
 .results {
 	text-align: center;
@@ -45,4 +47,10 @@ input[type=text] {
 	width: 350px;
 	padding-left: 5px;
 	color: #000;
+}
+.btn {
+	margin-top:15px;
+	color: rgb(222,222,222);
+	background-color: rgb(85, 127, 158);
+	font-size:inherit;
 }
