@@ -172,6 +172,9 @@ $(function() {
 			var d = $('<div/>').html('<span style="font-weight:bold;margin-right:10px">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</span>');
 			for(var i=0;i<res.length;i++) {
 				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
+				if(i<res.length-1) {
+					d.append(',');
+				}
 			}
 			d.appendTo(results);
 		})
