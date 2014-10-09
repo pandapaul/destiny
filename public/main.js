@@ -167,9 +167,10 @@ $(function() {
 	}
 
 	function showCurrency(character, isLastCharacter) {
+		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
 		getCurrency(character.characterBase)
 		.done(function (res) {
-			var d = $('<div/>').html('<span class="character">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</span>');
+			var d = $('<div/>').html('<a class="character" href="' + profileHref + '">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</a>');
 			for(var i=0;i<res.length;i++) {
 				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
 				if(i<res.length-1) {

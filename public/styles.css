@@ -50,7 +50,6 @@ input[type=text] {
 }
 .btn {
 	margin-top:15px;
-	color: rgb(222,222,222);
 	background-color: rgb(85, 127, 158);
 	font-size:inherit;
 }
