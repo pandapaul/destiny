@@ -2,6 +2,7 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		results = $('.results'),
+		characters = $('.characters'),
 		message = $('.message'),
 		selectedAccountType = 2,
 		errUnableToConnectToBungie = {text:'unable to connect to Bungie'},
@@ -28,7 +29,8 @@ $(function() {
 			1357277120: 'crucible',
 			2778795080: 'dead orbit',
 			1424722124: 'future war cult'
-		};
+		},
+		mostRecentCharacterDate = null;
 
 	function getUrlVars()
 	{
@@ -134,37 +136,6 @@ $(function() {
 		return dfd;
 	}
 
-	function requireCharacterSelection(res) {
-		console.log('require character selection');
-	}
-
-	function retrievePic(character) {
-		var url = 'http://www.bungie.net/en/Legend/' + character.membershipType + '/' + character.membershipId + '/' + character.characterId + '#gear';	
-
-		$.ajax({
-			type: 'POST',
-			url: '/getPic',
-			data: JSON.stringify({url: url}),
-			contentType:"application/json; charset=utf-8",
-			dataType:"json"
-		})
-		.done(function(data) {
-			if(!data.filename) {
-				return;
-			}
-			results.find('img').attr('src', data.filename);
-			results.find('a').html(url).attr('href', url);
-			results.show();
-			message.empty();
-		})
-		.fail(function() {
-			showError();
-		})
-		.always(function() {
-			button.attr('disabled',false);
-		});
-	}
-
 	function loadCharacterInfo(character, isLastCharacter) {
 		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
 		getCurrency(character.characterBase)
@@ -183,7 +154,13 @@ $(function() {
 						d.append(buildProgressBar(res[i]));
 					}
 				}
-				d.appendTo(results);
+				var characterDate = new Date(character.characterBase.dateLastPlayed);
+				if(!mostRecentCharacterDate || characterDate - mostRecentCharacterDate > 0) {
+					d.prependTo(characters);
+					mostRecentCharacterDate = characterDate;
+				} else {
+					d.appendTo(characters);
+				}
 			})
 			.always(function () {
 				if(isLastCharacter) {
@@ -226,7 +203,7 @@ $(function() {
 		updateHash();
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
-		results.empty();
+		characters.empty();
 		searchForMembership(username)
 		.done(function(res){
 			if(!res || res.length < 1) {
@@ -280,7 +257,6 @@ $(function() {
 		if(characterBase.membershipType === 1) {
 			accountType = 'TigerXbox';
 		}
-		console.log('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression');
 
 		$.jsonp({
 			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression',
