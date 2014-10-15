@@ -60,8 +60,9 @@ input[type=text] {
 	font-size:inherit;
 }
 .progress-description {
-	max-width: 200px;
+	max-width: 300px;
 	font-size: 16px;
+	padding: 1px;
 }
 .progress {
 	max-width: 300px;

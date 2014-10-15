@@ -275,9 +275,14 @@ $(function() {
 	function buildProgressBar(progressionData) {
 		var container = $('<div/>')
 				.addClass('progress-container'),
-			description = $('<span/>')
-				.addClass('progress-description')
-				.text(hashes[progressionData.progressionHash] + ' rank ' + progressionData.level),
+			description = $('<div/>')
+				.addClass('progress-description container clearfix'),
+			faction = $('<div/>')
+				.addClass('pull-left')
+				.text(hashes[progressionData.progressionHash]),
+			rank = $('<div/>')
+				.addClass('pull-right')
+				 .text('rank ' + progressionData.level),
 			progress = $('<div/>')
 				.addClass('progress'),
 			progressbar = $('<div/>')
@@ -290,6 +295,7 @@ $(function() {
 				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt)
 				.css('padding-left','3px');
 		progress.append(progressbar);
+		description.append(faction, rank);
 		return container.append(description, progress);
 	}
 
