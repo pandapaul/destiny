@@ -28,9 +28,11 @@ body {
 }
 .results {
 	text-align: center;
-	margin-top: 35px;
 }
-.results .character{
+.results .character-container{
+	margin-top:40px;
+}
+.results .character-link{
 	font-weight:bold;
 	color: rgb(206, 174, 50);
 	margin-right:10px;
@@ -52,4 +54,21 @@ input[type=text] {
 	margin-top:15px;
 	background-color: rgb(85, 127, 158);
 	font-size:inherit;
+}
+.progress-description {
+	max-width: 200px;
+	font-size: 16px;
+}
+.progress {
+	max-width: 300px;
+	margin-left:auto;
+	margin-right:auto;
+	background-color: rgba(222,222,222,0.2);
+}
+.progress-bar {
+	background-color: rgb(93,164,105);
+	color: #222;
+}
+.progress-container {
+	margin-top:10px;
 }

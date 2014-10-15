@@ -19,7 +19,15 @@ $(function() {
 			2204441813: 'female',
 			671679327: 'hunter',
 			3655393761: 'titan',
-			2271682572: 'warlock'
+			2271682572: 'warlock',
+			3871980777: 'new monarchy',
+			529303302: 'cryptarch',
+			2161005788: 'iron banner',
+			452808717: 'queen',
+			3233510749: 'vanguard',
+			1357277120: 'crucible',
+			2778795080: 'dead orbit',
+			1424722124: 'future war cult'
 		};
 
 	function searchForMembership(username) {
@@ -144,6 +152,36 @@ $(function() {
 		});
 	}
 
+	function loadCharacterInfo(character, isLastCharacter) {
+		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
+		getCurrency(character.characterBase)
+		.done(function (res) {
+			var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</a>');
+			for(var i=0;i<res.length;i++) {
+				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
+				if(i<res.length-1) {
+					d.append(',');
+				}
+			}
+			getProgress(character.characterBase)
+			.done(function (res) {
+				for(var i=0;i<res.length;i++) {
+					if(hashes[res[i].progressionHash]) {
+						d.append(buildProgressBar(res[i]));
+					}
+				}
+				d.appendTo(results);
+			})
+			.always(function () {
+				if(isLastCharacter) {
+					results.show();
+					message.empty();
+					button.attr('disabled',false);
+				}
+			});
+		});
+	}
+
 	function getCurrency(characterBase) {
 		var dfd = new $.Deferred(),
 			accountType = 'TigerPSN';
@@ -164,28 +202,6 @@ $(function() {
 			}
 		});
 		return dfd;
-	}
-
-	function showCurrency(character, isLastCharacter) {
-		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
-		getCurrency(character.characterBase)
-		.done(function (res) {
-			var d = $('<div/>').html('<a class="character" href="' + profileHref + '">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</a>');
-			for(var i=0;i<res.length;i++) {
-				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
-				if(i<res.length-1) {
-					d.append(',');
-				}
-			}
-			d.appendTo(results);
-		})
-		.always(function () {
-			if(isLastCharacter) {
-				results.show();
-				message.empty();
-				button.attr('disabled',false);
-			}
-		});
 	}
 
 	button.on('click', function() {
@@ -212,7 +228,7 @@ $(function() {
 			getCharacterIds(member)
 			.done(function(res) {
 				for(var i=0;i<res.data.characters.length;i++) {
-					showCurrency(res.data.characters[i], i===res.data.characters.length-1);
+					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1);
 				}
 			})
 			.fail(function(res) {
@@ -237,5 +253,72 @@ $(function() {
 	});
 
 	textInput.focus();
+
+	function getProgress(characterBase) {
+		var dfd = new $.Deferred(),
+			accountType = 'TigerPSN';
+
+		if(characterBase.membershipType === 1) {
+			accountType = 'TigerXbox';
+		}
+		console.log('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression');
+
+		$.jsonp({
+			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression',
+			dataType:"jsonp",
+			success: function(data) {
+				if(data && data.Response && data.Response.data && data.Response.data.progressions && data.Response.data.progressions.length) {
+					return dfd.resolve(data.Response.data.progressions);
+				} else {
+					dfd.reject(errNoResponseFromBungie);
+				}
+			}
+		});
+		return dfd;
+	}
+
+//{  
+//	"dailyProgress":0,
+//	"weeklyProgress":0,
+//	"currentProgress":29655,
+//	"level":11,
+//	"step":0,
+//	"progressToNextLevel":2255,
+//	"nextLevelAt":3000,
+//	"progressionHash":529303302
+//}
+
+// <div class="progress">
+//   <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+//     0%
+//   </div>
+// </div>
+// <div class="progress">
+//   <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="width: 2%;">
+//     2%
+//   </div>
+// </div>
+
+
+	function buildProgressBar(progressionData) {
+		var container = $('<div/>')
+				.addClass('progress-container'),
+			description = $('<span/>')
+				.addClass('progress-description')
+				.text(hashes[progressionData.progressionHash] + ' rank ' + progressionData.level),
+			progress = $('<div/>')
+				.addClass('progress'),
+			progressbar = $('<div/>')
+				.addClass('progress-bar')
+				.attr('role','progressbar')
+				.attr('aria-valuenow',progressionData.progressToNextLevel)
+				.attr('aria-valuemax',progressionData.nextLevelAt)
+				.attr('aria-valuemin','0')
+				.width(progressionData.progressToNextLevel/progressionData.nextLevelAt*100 + '%')
+				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt)
+				.css('padding-left','3px');
+		progress.append(progressbar);
+		return container.append(description, progress);
+	}
 
 });
