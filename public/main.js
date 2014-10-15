@@ -218,11 +218,12 @@ $(function() {
 	}
 
 	button.on('click', function() {
-		updateHash();
-		var username = textInput.val();
-		if(!$.trim(username)) {
+		var username = textInput.val().replace(/\s/g, '');
+		textInput.val(username);
+		if(!username) {
 			return;
 		}
+		updateHash();
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
 		results.empty();
