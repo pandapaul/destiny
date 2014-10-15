@@ -201,10 +201,13 @@ $(function() {
 			return;
 		}
 		updateHash();
+	});
+
+	function performSearch() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
 		characters.empty();
-		searchForMembership(username)
+		searchForMembership(textInput.val())
 		.done(function(res){
 			if(!res || res.length < 1) {
 				showError();
@@ -232,23 +235,11 @@ $(function() {
 			showError(res);
 			button.attr('disabled',false);
 		});
-	});
+	}
 
 	function updateHash() {
 		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
 	}
-
-	$("input:radio[name=accountType]").click(function() {
-    	selectedAccountType = parseInt($(this).val());
-	});
-
-	textInput.on('keypress', function(e) {
-		if(e.keyCode === 13) {
-			button.click();
-		}
-	});
-
-	textInput.focus();
 
 	function getProgress(characterBase) {
 		var dfd = new $.Deferred(),
@@ -299,14 +290,36 @@ $(function() {
 		return container.append(description, progress);
 	}
 
-	var urlVars = getUrlVars();
-	textInput.val(urlVars.un);
-	if(urlVars.t) {
-		selectedAccountType = parseInt(urlVars.t);
-		$('input:radio[name=accountType][value=' + urlVars.t + ']').attr('checked',true);
+	function updateFormFromHash() {
+		var urlVars = getUrlVars();
+		textInput.val(urlVars.un);
+		if(urlVars.t) {
+			selectedAccountType = parseInt(urlVars.t);
+			$('input:radio[name=accountType][value=' + urlVars.t + ']').click();
+		}
+		if(urlVars.un && urlVars.t) {
+			performSearch();
+		} else {
+			characters.empty();
+		}
 	}
-	if(urlVars.un && urlVars.t) {
-		button.click();
-	}
+
+	$(window).on('hashchange', function() {
+		updateFormFromHash();
+	});
+
+	$("input:radio[name=accountType]").click(function() {
+    	selectedAccountType = parseInt($(this).val());
+	});
+
+	textInput.on('keypress', function(e) {
+		if(e.keyCode === 13) {
+			button.click();
+		}
+	});
+
+	textInput.focus();
+
+	updateFormFromHash();
 
 });
