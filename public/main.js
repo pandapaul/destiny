@@ -30,6 +30,19 @@ $(function() {
 			1424722124: 'future war cult'
 		};
 
+	function getUrlVars()
+	{
+	    var vars = [], hash;
+	    var hashes = window.location.href.slice(window.location.href.indexOf('#') + 1).split('&');
+	    for(var i = 0; i < hashes.length; i++)
+	    {
+	        hash = hashes[i].split('=');
+	        vars.push(hash[0]);
+	        vars[hash[0]] = hash[1];
+	    }
+	    return vars;
+	}
+
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
 		$.jsonp({
@@ -205,6 +218,7 @@ $(function() {
 	}
 
 	button.on('click', function() {
+		updateHash();
 		var username = textInput.val();
 		if(!$.trim(username)) {
 			return;
@@ -242,6 +256,10 @@ $(function() {
 		});
 	});
 
+	function updateHash() {
+		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
+	}
+
 	$("input:radio[name=accountType]").click(function() {
     	selectedAccountType = parseInt($(this).val());
 	});
@@ -277,29 +295,6 @@ $(function() {
 		return dfd;
 	}
 
-//{  
-//	"dailyProgress":0,
-//	"weeklyProgress":0,
-//	"currentProgress":29655,
-//	"level":11,
-//	"step":0,
-//	"progressToNextLevel":2255,
-//	"nextLevelAt":3000,
-//	"progressionHash":529303302
-//}
-
-// <div class="progress">
-//   <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-//     0%
-//   </div>
-// </div>
-// <div class="progress">
-//   <div class="progress-bar" role="progressbar" aria-valuenow="2" aria-valuemin="0" aria-valuemax="100" style="width: 2%;">
-//     2%
-//   </div>
-// </div>
-
-
 	function buildProgressBar(progressionData) {
 		var container = $('<div/>')
 				.addClass('progress-container'),
@@ -319,6 +314,16 @@ $(function() {
 				.css('padding-left','3px');
 		progress.append(progressbar);
 		return container.append(description, progress);
+	}
+
+	var urlVars = getUrlVars();
+	textInput.val(urlVars.un);
+	if(urlVars.t) {
+		selectedAccountType = parseInt(urlVars.t);
+		$('input:radio[name=accountType][value=' + urlVars.t + ']').attr('checked',true);
+	}
+	if(urlVars.un && urlVars.t) {
+		button.click();
 	}
 
 });
