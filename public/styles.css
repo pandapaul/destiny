@@ -77,3 +77,6 @@ input[type=text] {
 .progress-container {
 	margin-top:10px;
 }
+.google-play-link {
+	margin-top:-2px;
+}
