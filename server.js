@@ -44,8 +44,14 @@ function incrementViewCount(req, res, next) {
 		}
 		viewCount++;
 		fs.writeFile('viewCount', viewCount, function(err) {
-			fs.writeFile('viewCountTimestamp', new Date(), function(err) {
-				next();
+			fs.readFile('viewCountTimestamp', function(err, data) {
+				if(!data) {
+					fs.writeFile('viewCountTimestamp', new Date(), function(err) {
+						next();
+					});
+				} else {
+					next();
+				}
 			});
 		});
 	});
