@@ -36,9 +36,35 @@ function getPic(req, res) {
 	});
 }
 
+function incrementViewCount(req, res, next) {
+	fs.readFile('viewCount', function(err, data) {
+		var viewCount = parseInt(data);
+		if(!viewCount) {
+			viewCount = 0;
+		}
+		viewCount++;
+		fs.writeFile('viewCount', viewCount, function(err) {
+			fs.writeFile('viewCountTimestamp', new Date(), function(err) {
+				next();
+			});
+		});
+	});
+}
+
+function getViewCount(req, res) {
+	fs.readFile('viewCount', function(err, count) {
+		fs.readFile('viewCountTimestamp', function(err, timestamp) {
+			res.write(count + ' views since ' + timestamp);
+			res.end();
+		});
+	});
+}
+
+app.get('/', incrementViewCount);
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.post('/getPic', getPic);
+app.get('/viewcount', getViewCount);
 
 var listenPort = process.env.PORT || 5000;
 app.listen(listenPort);
