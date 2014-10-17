@@ -45,7 +45,7 @@ function incrementViewCount(req, res, next) {
 		viewCount++;
 		fs.writeFile('viewCount', viewCount, function(err) {
 			fs.readFile('viewCountTimestamp', function(err, data) {
-				if(!data) {
+				if(!data || viewCount <= 1) {
 					fs.writeFile('viewCountTimestamp', new Date(), function(err) {
 						next();
 					});
