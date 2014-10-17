@@ -45,19 +45,40 @@ $(function() {
 	    return vars;
 	}
 
+	function jsonp(url, success, failure) {
+		return $.ajax({
+			'url': 'http://query.yahooapis.com/v1/public/yql',
+			'data': {
+				'q': 'SELECT * FROM json WHERE url="'+url+'"',
+				'format': 'json',
+				'jsonCompat': 'new'
+			},
+			'dataType': 'jsonp',
+			'success': 
+				function(data){
+					if (data && data.query && data.query.results && data.query.results.json) {
+						success(data.query.results.json);
+					} else {
+						failure(data);
+					}
+				}
+		});
+	}
+
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
-		$.jsonp({
-			url: 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
-			dataType:"jsonp",
-			success: function(data) {
+		jsonp('http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
+			function(data) {
 				if(data && data.Response) {
 					return handleSearchResponse(data.Response, dfd);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
+			},
+			function(data) {
+				dfd.reject(errNoResponseFromBungie);
 			}
-		});
+		);
 		return dfd;
 	}
 
@@ -109,17 +130,18 @@ $(function() {
 			accountType = 'TigerXbox';
 		}
 
-		$.jsonp({
-			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + member.membershipId + '/',
-			dataType:"jsonp",
-			success: function(data) {
+		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + member.membershipId + '/',
+			function(data) {
 				if(data && data.Response) {
 					return handleCharacterIdsResponse(data.Response, dfd);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
+			},
+			function(data) {
+				dfd.reject(errNoResponseFromBungie);
 			}
-		});
+		);
 		return dfd;
 	}
 
@@ -180,17 +202,18 @@ $(function() {
 			accountType = 'TigerXbox';
 		}
 
-		$.jsonp({
-			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory',
-			dataType:"jsonp",
-			success: function(data) {
+		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory/',
+			function(data) {
 				if(data && data.Response && data.Response.data && data.Response.data.currencies && data.Response.data.currencies.length) {
 					return dfd.resolve(data.Response.data.currencies);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
+			},
+			function(data) {
+				dfd.reject(errNoResponseFromBungie);
 			}
-		});
+		);
 		return dfd;
 	}
 
@@ -249,17 +272,18 @@ $(function() {
 			accountType = 'TigerXbox';
 		}
 
-		$.jsonp({
-			url: 'http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression',
-			dataType:"jsonp",
-			success: function(data) {
+		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression/',
+			function(data) {
 				if(data && data.Response && data.Response.data && data.Response.data.progressions && data.Response.data.progressions.length) {
 					return dfd.resolve(data.Response.data.progressions);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
+			},
+			function(data) {
+				dfd.reject(errNoResponseFromBungie);
 			}
-		});
+		);
 		return dfd;
 	}
 
