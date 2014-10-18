@@ -21,14 +21,14 @@ $(function() {
 			671679327: 'hunter',
 			3655393761: 'titan',
 			2271682572: 'warlock',
-			3871980777: 'new monarchy',
-			529303302: 'cryptarch',
-			2161005788: 'iron banner',
-			452808717: 'queen',
-			3233510749: 'vanguard',
-			1357277120: 'crucible',
-			2778795080: 'dead orbit',
-			1424722124: 'future war cult'
+			3871980777: 'New Monarchy',
+			529303302: 'Cryptarch',
+			2161005788: 'Iron Banner',
+			452808717: 'Queen',
+			3233510749: 'Vanguard',
+			1357277120: 'Crucible',
+			2778795080: 'Dead Orbit',
+			1424722124: 'Future War Cult'
 		},
 		mostRecentCharacterDate = null;
 
@@ -297,7 +297,7 @@ $(function() {
 				.text(hashes[progressionData.progressionHash]),
 			rank = $('<div/>')
 				.addClass('pull-right')
-				 .text('rank ' + progressionData.level),
+				 .text('Rank ' + progressionData.level),
 			progress = $('<div/>')
 				.addClass('progress'),
 			progressbar = $('<div/>')
