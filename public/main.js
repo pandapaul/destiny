@@ -28,7 +28,11 @@ $(function() {
 			3233510749: 'Vanguard',
 			1357277120: 'Crucible',
 			2778795080: 'Dead Orbit',
-			1424722124: 'Future War Cult'
+			1424722124: 'Future War Cult',
+			weeklyMarks: {
+				2033897742: 'Weekly Vanguard Marks',
+				2033897755: 'Weekly Crucible Marks'
+			}
 		},
 		mostRecentCharacterDate = null;
 
@@ -169,11 +173,16 @@ $(function() {
 					d.append(',');
 				}
 			}
+			var w = $('<div/>')
+				.addClass('character-weekly-marks')
+				.appendTo(d);
 			getProgress(character.characterBase)
 			.done(function (res) {
 				for(var i=0;i<res.length;i++) {
 					if(hashes[res[i].progressionHash]) {
 						d.append(buildProgressBar(res[i]));
+					} else if(hashes.weeklyMarks[res[i].progressionHash]) {
+						w.append(buildMarksBar(res[i]));
 					}
 				}
 				var characterDate = new Date(character.characterBase.dateLastPlayed);
@@ -311,6 +320,30 @@ $(function() {
 				.css('padding-left','3px');
 		progress.append(progressbar);
 		description.append(faction, rank);
+		return container.append(description, progress);
+	}
+
+	function buildMarksBar(progressionData) {
+		var container = $('<div/>')
+				.addClass('progress-container'),
+			description = $('<div/>')
+				.addClass('progress-description container clearfix'),
+			title = $('<div/>')
+				.addClass('pull-left')
+				.text(hashes.weeklyMarks[progressionData.progressionHash]),
+			progress = $('<div/>')
+				.addClass('progress'),
+			progressbar = $('<div/>')
+				.addClass('progress-bar')
+				.attr('role','progressbar')
+				.attr('aria-valuenow',progressionData.level)
+				.attr('aria-valuemax',100)
+				.attr('aria-valuemin','0')
+				.width(progressionData.level + '%')
+				.text(progressionData.level + '/100')
+				.css('padding-left','3px');
+		progress.append(progressbar);
+		description.append(title);
 		return container.append(description, progress);
 	}
 
