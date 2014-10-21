@@ -9,6 +9,7 @@ $(function() {
 		errNoResponseFromBungie = {text:'no response from Bungie'},
 		errNoMatchesFound = {text:'no matches found'},
 		errNoCharactersFound = {text:'no characters found'},
+		errUnableToConnect = {text: 'unable to connect'},
 		hashes = {
 			3159615086: 'glimmer',
 			1415355184: 'crucible marks',
@@ -50,22 +51,20 @@ $(function() {
 	}
 
 	function jsonp(url, success, failure) {
-		return $.ajax({
-			'url': 'http://query.yahooapis.com/v1/public/yql',
-			'data': {
-				'q': 'SELECT * FROM json WHERE url="'+url+'"',
-				'format': 'json',
-				'jsonCompat': 'new'
-			},
-			'dataType': 'jsonp',
-			'success': 
-				function(data){
-					if (data && data.query && data.query.results && data.query.results.json) {
-						success(data.query.results.json);
-					} else {
-						failure(data);
-					}
-				}
+		$.ajax({
+			type: 'POST',
+			url: '/proxyJSON',
+			data: JSON.stringify({targetUrl: url}),
+			contentType:'application/json; charset=utf-8',
+			dataType: 'json'
+		}).done(function(data) {
+			if(data.Response) {
+				success(data);
+			} else {
+				failure(errNoResponseFromBungie);
+			}
+		}).fail(function () {
+			failure(errUnableToConnect);
 		});
 	}
 
@@ -79,8 +78,8 @@ $(function() {
 					dfd.reject(errNoResponseFromBungie);
 				}
 			},
-			function(data) {
-				dfd.reject(errNoResponseFromBungie);
+			function(error) {
+				dfd.reject(error);
 			}
 		);
 		return dfd;
@@ -142,8 +141,8 @@ $(function() {
 					dfd.reject(errNoResponseFromBungie);
 				}
 			},
-			function(data) {
-				dfd.reject(errNoResponseFromBungie);
+			function(err) {
+				dfd.reject(err);
 			}
 		);
 		return dfd;
@@ -219,8 +218,8 @@ $(function() {
 					dfd.reject(errNoResponseFromBungie);
 				}
 			},
-			function(data) {
-				dfd.reject(errNoResponseFromBungie);
+			function(err) {
+				dfd.reject(err);
 			}
 		);
 		return dfd;
@@ -289,8 +288,8 @@ $(function() {
 					dfd.reject(errNoResponseFromBungie);
 				}
 			},
-			function(data) {
-				dfd.reject(errNoResponseFromBungie);
+			function(err) {
+				dfd.reject(err);
 			}
 		);
 		return dfd;

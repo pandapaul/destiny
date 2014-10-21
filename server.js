@@ -5,7 +5,8 @@ var path = require('path'),
 	bodyParser = require('body-parser'),
 	app = express(),
 	binPath = slimerjs.path,
-	slimerPath  = path.join(__dirname, 'slimer.js');
+	slimerPath  = path.join(__dirname, 'slimer.js'),
+	http = require('http');
 
 var fs = require('fs');
 
@@ -66,11 +67,40 @@ function getViewCount(req, res) {
 	});
 }
 
+function proxyJSON(req, res) {
+
+	if(!req.body.targetUrl) {
+		res.end();
+		return;
+	}
+
+	var http = require('http');
+
+	http.get(req.body.targetUrl, function(bungieRes) {
+	    var body = '';
+
+	    bungieRes.on('data', function(chunk) {
+	        body += chunk;
+	    });
+
+	    bungieRes.on('end', function() {
+	        var bungieJSON = JSON.parse(body);
+	        res.json(bungieJSON);
+	        res.end();
+	    });
+	}).on('error', function(e) {
+	      console.log("Got error from bungie: ", e);
+	      res.json({bungieProxyError: e});
+	      res.end();
+	});
+
+}
+
 app.get('/', incrementViewCount);
 app.use(express.static('public'));
 app.use(bodyParser.json());
-app.post('/getPic', getPic);
 app.get('/viewcount', getViewCount);
+app.post('/proxyJSON', proxyJSON);
 
 var listenPort = process.env.PORT || 5000;
 app.listen(listenPort);
