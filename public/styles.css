@@ -83,3 +83,9 @@ input[type=text] {
 .google-play-link {
 	margin-top:-2px;
 }
+.code {
+	color: rgb(78, 50, 99);
+	font-family: monospace;
+	background-color: #f5f5f5;
+	font-size: 0.9em;
+}
