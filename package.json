@@ -1,6 +1,6 @@
 {
-  "name": "dppg",
-  "subdomain": "dppg",
+  "name": "destiny-search",
+  "subdomain": "destiny-search",
   "scripts": {
     "start": "node server.js"
   },
@@ -12,6 +12,7 @@
     "express": "4.9.5",
     "slimerjs": "0.9.1-2",
     "path": "0.4.9",
-    "body-parser": "1.9.0"
+    "body-parser": "1.9.0",
+    "request": "2.45.0"
   }
 }

@@ -6,7 +6,7 @@ var path = require('path'),
 	app = express(),
 	binPath = slimerjs.path,
 	slimerPath  = path.join(__dirname, 'slimer.js'),
-	http = require('http');
+	request = require('request');
 
 var fs = require('fs');
 
@@ -70,30 +70,22 @@ function getViewCount(req, res) {
 function proxyJSON(req, res) {
 
 	if(!req.body.targetUrl) {
+		res.json({proxyError:'missing targetUrl'});
 		res.end();
 		return;
 	}
 
-	var http = require('http');
-
-	http.get(req.body.targetUrl, function(bungieRes) {
-	    var body = '';
-
-	    bungieRes.on('data', function(chunk) {
-	        body += chunk;
-	    });
-
-	    bungieRes.on('end', function() {
-	        var bungieJSON = JSON.parse(body);
-	        res.json(bungieJSON);
-	        res.end();
-	    });
-	}).on('error', function(e) {
-	      console.log("Got error from bungie: ", e);
-	      res.json({bungieProxyError: e});
-	      res.end();
+	request({
+		url: req.body.targetUrl,
+		json: true
+	}, function (error, response, body) {
+		if (!error && response.statusCode == 200) {
+			res.json(body);
+		} else {
+			res.json({proxyError:error});
+		}
+		res.end();
 	});
-
 }
 
 app.get('/', incrementViewCount);
