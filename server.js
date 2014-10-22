@@ -7,32 +7,35 @@ var path = require('path'),
 var fs = require('fs');
 
 function incrementViewCount(req, res, next) {
-	fs.readFile('viewCount', function(err, data) {
-		var viewCount = parseInt(data);
-		if(!viewCount) {
-			viewCount = 0;
-		}
-		viewCount++;
-		fs.writeFile('viewCount', viewCount, function(err) {
-			fs.readFile('viewCountTimestamp', function(err, data) {
-				if(!data || viewCount === 1) {
-					fs.writeFile('viewCountTimestamp', new Date(), function(err) {
-						next();
-					});
-				} else {
-					next();
+	fs.readFile('viewCount.json', function(err, data) {
+		var viewData = {count:1, timestamp: new Date()}
+		if(!err)	{
+				try {
+					viewData = JSON.parse(data)
+					viewData.count++;
+					viewData.timestamp = new Date();
 				}
-			});
+				catch(e) {
+					// could not parse data
+				}
+		}
+		output = JSON.stringify(viewData)
+		fs.writeFile('viewCount.json', output, function(err) {
+					next();
 		});
 	});
 }
 
 function getViewCount(req, res) {
-	fs.readFile('viewCount', function(err, count) {
-		fs.readFile('viewCountTimestamp', function(err, timestamp) {
-			res.write(count + ' views since ' + timestamp);
+	fs.readFile('viewCount.json', function(err, data) {
+		if (!err)	{
+			var viewData = JSON.parse(data);
+			res.write(viewData.count + ' views since ' + viewData.timestamp);
 			res.end();
-		});
+		}
+		else {
+			res.send('no data');
+		}
 	});
 }
 

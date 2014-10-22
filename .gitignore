@@ -31,3 +31,6 @@ public/pics
 
 viewCount
 viewCountTimestamp
+viewCount.json
+
+.DS_Store
