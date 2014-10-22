@@ -1,5 +1,4 @@
-var path = require('path'),
-	express = require('express'),
+var express = require('express'),
 	bodyParser = require('body-parser'),
 	app = express(),
 	request = require('request');
@@ -27,7 +26,7 @@ function incrementViewCount(req, res, next) {
 
 function getViewCount(req, res) {
 	fs.readFile('viewCount.json', function(err, data) {
-		if (!err)	{
+		if (!err) {
 			try {
 				var viewData = JSON.parse(data);
 				res.write(viewData.count + ' views since ' + viewData.timestamp);
