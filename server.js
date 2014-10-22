@@ -13,10 +13,9 @@ function incrementViewCount(req, res, next) {
 			try {
 				viewData = JSON.parse(data);
 				viewData.count++;
-				viewData.timestamp = new Date();
 			}
 			catch(e) {
-				// could not parse data
+				viewData = {count:1, timestamp: new Date()};
 			}
 		}
 		output = JSON.stringify(viewData);
@@ -29,9 +28,14 @@ function incrementViewCount(req, res, next) {
 function getViewCount(req, res) {
 	fs.readFile('viewCount.json', function(err, data) {
 		if (!err)	{
-			var viewData = JSON.parse(data);
-			res.write(viewData.count + ' views since ' + viewData.timestamp);
-			res.end();
+			try {
+				var viewData = JSON.parse(data);
+				res.write(viewData.count + ' views since ' + viewData.timestamp);
+				res.end();
+			}
+			catch(e) {
+				res.send('data read error');
+			}
 		}
 		else {
 			res.send('no data');
