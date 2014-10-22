@@ -8,20 +8,20 @@ var fs = require('fs');
 
 function incrementViewCount(req, res, next) {
 	fs.readFile('viewCount.json', function(err, data) {
-		var viewData = {count:1, timestamp: new Date()}
-		if(!err)	{
-				try {
-					viewData = JSON.parse(data)
-					viewData.count++;
-					viewData.timestamp = new Date();
-				}
-				catch(e) {
-					// could not parse data
-				}
+		var viewData = {count:1, timestamp: new Date()};
+		if(!err) {
+			try {
+				viewData = JSON.parse(data);
+				viewData.count++;
+				viewData.timestamp = new Date();
+			}
+			catch(e) {
+				// could not parse data
+			}
 		}
-		output = JSON.stringify(viewData)
+		output = JSON.stringify(viewData);
 		fs.writeFile('viewCount.json', output, function(err) {
-					next();
+			next();
 		});
 	});
 }
