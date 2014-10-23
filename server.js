@@ -63,6 +63,15 @@ function proxyJSON(req, res) {
 	});
 }
 
+function redirectIfNeeded(req, res, next) {
+	if(req.header('host').indexOf('herokuapp.com') > -1) {
+		res.redirect(301, 'http://www.destinyrep.com');
+	} else {
+		next();
+	}
+}
+
+app.get('/', redirectIfNeeded);
 app.get('/', incrementViewCount);
 app.use(express.static('public'));
 app.use(bodyParser.json());
