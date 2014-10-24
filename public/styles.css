@@ -88,6 +88,7 @@ a {
 .progress-bar {
 	background-color: rgb(93,164,105);
 	color: #222;
+	font-size: 14px;
 }
 .progress-container {
 	margin-top:10px;
