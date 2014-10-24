@@ -1,10 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>DestinyRep</title>
+	<title>DestinyRep.com</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 	<script src="main.js"></script>
-	<script src="jsonproxy.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 	<link rel="stylesheet" href="styles.css">
 	<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -19,39 +18,146 @@
 </head>
 <body>
 
-<div class="header"></div>
-<script>$('.header').load('header.html');</script>
-
-<div class="container news">
-New <a href="http://www.reddit.com/r/DestinyTheGame/comments/2k3kjz/destinyrepcom_new_domain_for_destiny_search_web/">Reddit post</a> detailing some upcoming changes.
-</div>
-
-<div class="container description">
-Check any player's reputation, weekly marks, cryptarch rank, & more. Like what you see? <a href="https://play.google.com/store/apps/details?id=com.ionicframework.destinysearch929844">Get the Android app.</a>
-</div>
-
-<div class="container clearfix form-horizontal">
-	<label id="fieldLabel" for="textInput" class="control-label">username</label><input type="text" id="textInput" name="textInput" class="pull-right form-control" placeholder="a destiny username"/>
-</div>
-<div class="container">
-	<div class="form-horizontal pull-right">
-		<label for="radio-psn" class="radio-inline"><input type="radio" id="radio-psn" name="accountType" value="2" checked/> psn</label>
-		<label for="radio-xbox" class="radio-inline"><input type="radio" id="radio-xbox" name="accountType" value="1"/> xbox</label>
+<div class="header">
+	<div class="container clearfix">
+		<div class="pull-left">
+			<a href="/" class="header-link">DESTINY REP</a>
+		</div>
+		<div class="pull-right google-play-link">
+			<a href="https://play.google.com/store/apps/details?id=com.ionicframework.destinysearch929844">
+			  <img alt="Get it on Google Play" height="39px" src="http://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
+			</a>
+		</div>
 	</div>
 </div>
-<div class="container clearfix">
-	<div class="pull-right">
-		<span class="message"></span>
-		<button id="submitButton" class="btn">Search</button>
+
+<div class="search">
+
+	<div class="container">
+		<h2>Search</h2>
 	</div>
+
+	<div class="container description">
+	Check any player's reputation, weekly marks, cryptarch rank, & more.<br>Like what you see? <a href="https://play.google.com/store/apps/details?id=com.ionicframework.destinysearch929844">Get the Android app.</a>
+	</div>
+
+	<div class="container">
+	    <div class="input-with-button input-group">
+	        <input type="text" id="textInput" name="textInput" class="form-control" placeholder="username"/>
+	        <span class="input-group-btn">
+	            <button class="btn glyphicon glyphicon-search" id="submitButton"></button>
+	        </span>
+	    </div>
+	</div>
+
+	<div class="container clearfix">
+	    <span class="message pull-left"></span>
+	    <div class="form-horizontal pull-right">
+	        <label for="radio-psn" class="radio-inline"><input type="radio" id="radio-psn" name="accountType" value="2" checked/> psn</label>
+	        <label for="radio-xbox" class="radio-inline"><input type="radio" id="radio-xbox" name="accountType" value="1"/> xbox</label>
+	    </div>
+	</div>
+
 </div>
 
 <div class="container-fluid results">
 	<div class="characters"></div>
 </div>
 
-<div class="footer"></div>
-<script>$('.footer').load('footer.html');</script>
+<div class="about spa-section">
+
+	<div class="news container">
+		<h2>News</h2>
+		<ul>
+			<li>Reorganizing the site a bit so that everything is accessible on the main page.</li>
+			<li>And here's a <a href="http://www.reddit.com/r/DestinyTheGame/comments/2k3kjz/destinyrepcom_new_domain_for_destiny_search_web/">Reddit post</a> detailing some upcoming changes.</li>
+		</ul>
+	</div>
+
+	<div class="container ">
+		<h2>How it Works</h2>
+		<p>
+			Destiny Search requires only two things: a username and an account type. It then conects to Bungie.net through a series of service endpoints to retrieve various pieces of publicly available character data. The result is a clean, concise view of a player's Destiny characters. <a class="search-link" href="/#un=secretpandaman&t=2">Try it out.</a>
+		</p>
+	</div>
+
+	<div class="container">
+		<h2>FAQ</h2>
+		<dl>
+			<dt>Why should I get the Android app?</dt>
+			<dd>It's a more refined & streamlined version of the web app, and it will be receiving features like notifications that won't be available on the web version.</dd>
+			<br><dt>Will you add X, Y, or Z?</dt>
+			<dd>Probably so. Feel free to <a class="contact-link">ask me about it.</a></dd>
+			<br><dt>Mind if I link to your site?</dt>
+			<dd>I'd be delighted.</dd>
+		</dl>
+	</div>
+
+	<div class="container" id="use">
+		<h2>Using Destiny Search on Your Site</h2>
+		<p>Feel free to add links to Destiny Search results on your own site. Direct links to specific user results are simply:</p>
+		<p class="code">http://www.destinyrep.com/#un=[username]&t=[accountType]
+			<dl class="code">
+				<dt>[username]</dt>
+				<dd>a psn username or xbox gamertag with all spaces removed</dd>
+				<dt>[accountType]</dt>
+				<dd>a 1 for xbox or 2 for psn</dd>
+			</dl>
+		</p>
+		<p>Please do <a class="contact-link">let me know</a> when the links go live or if you have any questions, but that's about all there is to it.</p>
+	</div>
+
+	<div class="container">
+		<h2>Privacy Policy</h2>
+		DestinyRep.com does not store any information about you or your Destiny account. Each time a search is performed, the data is pulled straight from Bungie.net. The data is not used in any fashion other than being shown as search results to users of the site.
+	</div>	
+</div>
+
+<div class="container cool-stuff spa-section">
+	<h2>Super Cool Stuff</h2>
+	<dl>
+		<dt><a href="https://play.google.com/store/apps/details?id=com.ionicframework.destinysearch929844">Destiny Search Android App</a></dt>
+		<dd>The Android version of Destiny Search. Handles destiny search links for you with favoriting, sharing, and a sleek UI. Support the free web app by downloading it.</dd>
+	</dl>
+	<dl>
+		<dt><a href="http://destinylfg.com">DestinyLFG.com</a></dt>
+		<dd>Find a Destiny group fast for on-the-fly raids, weeklies, and more. Check it out.</dd>
+	</dl>
+	<dl>
+		<dt><a href="http://twitter.com/owlboy">@OwlBoy</a></dt>
+		<dd>OwlBoy (Bryan Bortz) made the icons for DestinyRep.com. They're awesome. He's awesome.</dd>
+	</dl>
+	<dl>
+		<dt><a href="http://pandapaul-crypto.jit.su/">Crypto</a></dt>
+		<dd>A live, multiplayer word puzzle game that utilizes randomly generated substitution cyphers</dd>
+	</dl>
+</div>
+
+<div class="contact spa-section">
+	<div class="container">
+		<h2>Contact</h2>
+		<dl>
+			<dd>SecretPandaMan on <a href="http://www.bungie.net/en/Profile/254/7687439">Bungie.net</a></dd>
+			<dd>PandaPaul on <a href="http://www.twitter.com/pandapaul">Twitter</a></dd>
+			<dd>PandaPaul on <a href="http://www.reddit.com/user/pandapaul">Reddit</a></dd>
+			<dd>PandaPaulTube on <a href="http://www.youtube.com/pandapaultube">YouTube</a></dd>
+		</dl>
+	</div>
+</div>
+
+<div class="footer">
+	<div class="text-muted">
+		<div class="container text-center">
+			<a class="cool-stuff-link">cool stuff</a> | 
+			<a class="about-link">about</a> | 
+			<a class="contact-link">contact</a> | 
+			<a class="search-link">top</a>
+		</div>
+	</div>
+	<div class="hidden tags">
+	Tags: destiny reputation rep check track tracking player character search progress progression level rank marks vanguard crucible cryptarch future war cult new monarchy dead orbit event iron banner queen psn xbox bungie game glimmer pandapaul secretpandaman companion
+	</div>
+</div>
 
 </body>
 </html>

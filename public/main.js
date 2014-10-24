@@ -378,4 +378,35 @@ $(function() {
 
 	updateFormFromHash();
 
+	var bodyTopMargin = parseInt($('body').css('margin-top')),
+		searchDiv = $('.search'),
+		coolStuffDiv = $('.cool-stuff'),
+		aboutDiv = $('.about'),
+		contactDiv = $('.contact');
+
+	console.log(bodyTopMargin);
+
+	function scrollToDiv(div) {
+		var pos = div.offset();
+		console.log(pos);
+		pos.top -= bodyTopMargin;
+		scrollTo(pos.left, pos.top);
+	}
+
+	$('.search-link').on('click', function() {
+		scrollToDiv(searchDiv);
+	});
+
+	$('.cool-stuff-link').on('click', function() {
+		scrollToDiv(coolStuffDiv);
+	});
+
+	$('.about-link').on('click', function() {
+		scrollToDiv(aboutDiv);
+	});
+
+	$('.contact-link').on('click', function() {
+		scrollToDiv(contactDiv);
+	});
+
 });
