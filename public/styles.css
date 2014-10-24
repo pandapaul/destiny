@@ -139,3 +139,6 @@ a {
 .btn:hover {
 	color: rgb(180,180,180);
 }
+.ad {
+	max-height:100px;
+}
