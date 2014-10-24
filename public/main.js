@@ -378,17 +378,14 @@ $(function() {
 
 	updateFormFromHash();
 
-	var bodyTopMargin = parseInt($('body').css('margin-top')),
+	var bodyTopMargin = parseInt($('body').css('margin-top')) || 90,
 		searchDiv = $('.search'),
 		coolStuffDiv = $('.cool-stuff'),
 		aboutDiv = $('.about'),
 		contactDiv = $('.contact');
 
-	console.log(bodyTopMargin);
-
 	function scrollToDiv(div) {
 		var pos = div.offset();
-		console.log(pos);
 		pos.top -= bodyTopMargin;
 		scrollTo(pos.left, pos.top);
 	}
