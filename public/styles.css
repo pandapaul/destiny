@@ -12,8 +12,11 @@ body {
 a {
 	cursor: pointer;
 }
+.search {
+	min-height:800px;
+	min-height:100vh;
+}
 .about {
-	margin-top: 300px;
 	background-color: rgba(222,222,222,0.05);
 }
 .contact {
@@ -51,9 +54,6 @@ a {
 .container {
 	max-width: 750px;
 	margin-top: 10px;
-}
-.search .container{
-	max-width: 750px;
 }
 .message {
 	margin-top: 7px;
@@ -115,6 +115,10 @@ a {
 	padding: 5px;
 	font-size: inherit;
 }
+.input-with-button input:focus {
+	border: 3px solid rgb(78, 50, 99);
+	box-shadow: none;
+}
 .input-with-button .btn {
 	background-color: rgb(78, 50, 99);
 	font-size:18px;
@@ -127,6 +131,9 @@ a {
 	border-bottom-left-radius: 0px;
 	border-top-right-radius: 0px;
 	border-bottom-right-radius: 0px;*/
+}
+.input-with-button .btn:focus {
+	outline: 0 !important;
 }
 .btn:hover {
 	color: rgb(180,180,180);
