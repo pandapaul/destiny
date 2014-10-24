@@ -390,7 +390,7 @@ $(function() {
 	}
 
 	$('.search-link').on('click', function() {
-		scrollTo(0);
+		scrollTo(0,0);
 	});
 
 	$('.cool-stuff-link').on('click', function() {
