@@ -379,7 +379,6 @@ $(function() {
 	updateFormFromHash();
 
 	var headerHeight = parseInt($('.header').css('height')),
-		searchDiv = $('.search'),
 		coolStuffDiv = $('.cool-stuff'),
 		aboutDiv = $('.about'),
 		contactDiv = $('.contact');
@@ -391,7 +390,7 @@ $(function() {
 	}
 
 	$('.search-link').on('click', function() {
-		scrollToDiv(searchDiv);
+		scrollTo(0);
 	});
 
 	$('.cool-stuff-link').on('click', function() {
