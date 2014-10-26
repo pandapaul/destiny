@@ -139,7 +139,7 @@ a {
 .btn:hover {
 	color: rgb(180,180,180);
 }
-.ad {
-	max-height:100px !important;
+.adsbygoogle {
+	height:100px !important;
 	padding:0;
 }
