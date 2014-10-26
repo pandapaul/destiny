@@ -140,6 +140,6 @@ a {
 	color: rgb(180,180,180);
 }
 .ad {
-	max-height:100px;
+	max-height:100px !important;
 	padding:0;
 }
