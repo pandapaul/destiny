@@ -5,8 +5,8 @@ Description
 -------------
 Destiny Search requires only two things: a username and an account type. It then connects to Bungie.net through a series of service endpoints to retrieve various pieces of publicly available character data. The result is a clean, concise view of a player's Destiny characters.
 
-+ Currently running at [destinyrep.com](http://www.destinyrep.com/)
-+ And the Android variant: [Google Play Store](https://play.google.com/store/apps/details?id=com.jpapps.repsearch)
++ [destinyrep.com](http://www.destinyrep.com/) is based on this project
++ And so is the Android variant: [Google Play Store](https://play.google.com/store/apps/details?id=com.jpapps.repsearch)
 
 
 Install & Run
