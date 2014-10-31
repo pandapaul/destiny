@@ -20,7 +20,11 @@ a {
 	background-color: rgba(222,222,222,0.05);
 }
 .contact {
-	background-color: rgba(222,222,222,0.05);	
+	background-color: rgba(222,222,222,0.05);
+}
+.bottom-ad {
+	padding-top: 25px;
+	background-color: rgba(222,222,222,0.05);
 }
 .header {
 	position:fixed;
