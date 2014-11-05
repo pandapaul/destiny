@@ -106,8 +106,8 @@ $(function() {
 			contentType:'application/json; charset=utf-8',
 			dataType: 'json'
 		}).done(function(data) {
-			if(data.Response) {
-				success(data);
+			if(data && data.Response) {
+				success(data.Response);
 			} else {
 				failure(errNoResponseFromBungie);
 			}
@@ -116,15 +116,54 @@ $(function() {
 		});
 	}
 
+	function performSearch() {
+		startLoading();
+		searchForMembership(textInput.val())
+		.done(function(res){
+			var member = {},
+				mostRecentResetDate = getDateOfMostRecentReset();
+			for(var i=0;i<res.length;i++) {
+				if(res[i].membershipType === selectedAccountType) {
+					member = res[i];
+					break;
+				}
+			}
+			getCharacterIds(member)
+			.done(function(res) {
+				for(var i=0;i<res.data.characters.length;i++) {
+					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1, mostRecentResetDate);
+				}
+			})
+			.fail(function(err) {
+				stopLoading(err);
+			});
+		})
+		.fail(function(err){
+			stopLoading(err);
+		});
+	}
+
+	function startLoading() {
+		showMessage({text:'loading...',level:'info'});
+		button.attr('disabled',true);
+		characters.empty();
+	}
+
+	function stopLoading(err) {
+		if(err) {
+			showError(err);
+		} else {
+			message.empty();
+		}
+		button.attr('disabled',false);
+		results.show();
+	}
+
 	function searchForMembership(username) {
 		var dfd = new $.Deferred();
 		jsonp('http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
-			function(data) {
-				if(data && data.Response) {
-					return handleSearchResponse(data.Response, dfd);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
+			function(res) {
+				handleSearchResponse(res, dfd);
 			},
 			function(error) {
 				dfd.reject(error);
@@ -134,43 +173,11 @@ $(function() {
 	}
 
 	function handleSearchResponse(res, dfd) {
-		if(!res) {
-			dfd.reject(errNoResponseFromBungie);
-			return dfd;
-		}
 		if(res.length < 1) {
 			dfd.reject(errNoMatchesFound);
 		} else {
 			dfd.resolve(res);
 		}
-		return dfd;
-	}
-
-	function showMessage(msg) {
-		if(!msg) {
-			return;
-		}
-		if(typeof msg === 'string') {
-			msg = {text:msg};
-		}
-		if(msg.level === 'info') {
-			message.css('color','');
-		} else {
-			message.css('color','#a94442');
-		}
-		if(msg.text) {
-			message.text(msg.text);
-		} else {
-			message.text('unknown error');
-		}
-	}
-
-	function showError(err) {
-		if(typeof err === 'string') {
-			err = {text:err};
-		}
-		err.level = 'error';
-		showMessage(err);
 	}
 
 	function getCharacterIds(member) {
@@ -182,12 +189,8 @@ $(function() {
 		}
 
 		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + member.membershipId + '/',
-			function(data) {
-				if(data && data.Response) {
-					return handleCharacterIdsResponse(data.Response, dfd);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
+			function(res) {
+				handleCharacterIdsResponse(res, dfd);
 			},
 			function(err) {
 				dfd.reject(err);
@@ -197,35 +200,14 @@ $(function() {
 	}
 
 	function handleCharacterIdsResponse(res, dfd) {
-		if(!res) {
-			dfd.reject(errNoResponseFromBungie);
-			return dfd;
-		}
 		if(!res.data || !res.data.characters || res.data.characters.length < 1) {
 			dfd.reject(errNoCharactersFound);
 		} else {
 			dfd.resolve(res);
 		}
-		return dfd;
 	}
 
-	function getDateOfMostRecentReset() {
-		var date = new Date();
-		var currentDayOfWeek = date.getUTCDay();
-		var distanceToMostRecentTuesday = currentDayOfWeek - 2;
-		if(distanceToMostRecentTuesday < 0 || (distanceToMostRecentTuesday === 0 && date.getUTCHours() < 9)) {
-			distanceToMostRecentTuesday += 7;
-		}
-		date.setUTCDate(date.getUTCDate() - distanceToMostRecentTuesday);
-		date.setUTCHours(9);
-		date.setUTCMinutes(0);
-		date.setUTCSeconds(0);
-		date.setUTCMilliseconds(0);
-		return date;
-	}
-
-	function loadCharacterInfo(character, isLastCharacter) {
-		var mostRecentResetDate = getDateOfMostRecentReset();
+	function loadCharacterInfo(character, isLastCharacter, mostRecentResetDate) {
 		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
 		getCurrency(character.characterBase)
 		.done(function (res) {
@@ -273,12 +255,25 @@ $(function() {
 			})
 			.always(function () {
 				if(isLastCharacter) {
-					results.show();
-					message.empty();
-					button.attr('disabled',false);
+					stopLoading();
 				}
 			});
 		});
+	}
+
+	function getDateOfMostRecentReset() {
+		var date = new Date();
+		var currentDayOfWeek = date.getUTCDay();
+		var distanceToMostRecentTuesday = currentDayOfWeek - 2;
+		if(distanceToMostRecentTuesday < 0 || (distanceToMostRecentTuesday === 0 && date.getUTCHours() < 9)) {
+			distanceToMostRecentTuesday += 7;
+		}
+		date.setUTCDate(date.getUTCDate() - distanceToMostRecentTuesday);
+		date.setUTCHours(9);
+		date.setUTCMinutes(0);
+		date.setUTCSeconds(0);
+		date.setUTCMilliseconds(0);
+		return date;
 	}
 
 	function getCurrency(characterBase) {
@@ -290,79 +285,9 @@ $(function() {
 		}
 
 		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory/',
-			function(data) {
-				if(data && data.Response && data.Response.data && data.Response.data.currencies && data.Response.data.currencies.length) {
-					return dfd.resolve(data.Response.data.currencies);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
-	}
-
-	button.on('click', function() {
-		var username = textInput.val().replace(/\s/g, '');
-		textInput.val(username);
-		if(!username) {
-			return;
-		}
-		updateHash();
-	});
-
-	function performSearch() {
-		showMessage({text:'loading...',level:'info'});
-		button.attr('disabled',true);
-		characters.empty();
-		searchForMembership(textInput.val())
-		.done(function(res){
-			if(!res || res.length < 1) {
-				showError();
-				return;
-			}
-			var member = {};
-			for(var i=0;i<res.length;i++) {
-				if(res[i].membershipType === selectedAccountType) {
-					member = res[i];
-					break;
-				}
-			}
-			getCharacterIds(member)
-			.done(function(res) {
-				for(var i=0;i<res.data.characters.length;i++) {
-					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1);
-				}
-			})
-			.fail(function(res) {
-				showError(res);
-				button.attr('disabled',false);
-			});
-		})
-		.fail(function(res){
-			showError(res);
-			button.attr('disabled',false);
-		});
-	}
-
-	function updateHash() {
-		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
-	}
-
-	function getProgress(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression/',
-			function(data) {
-				if(data && data.Response && data.Response.data && data.Response.data.progressions && data.Response.data.progressions.length) {
-					return dfd.resolve(data.Response.data.progressions);
+			function(res) {
+				if(res.data && res.data.currencies && res.data.currencies.length) {
+					dfd.resolve(res.data.currencies);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
@@ -383,9 +308,9 @@ $(function() {
 		}
 
 		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Activities/',
-			function(data) {
-				if(data && data.Response && data.Response.data && data.Response.data.available && data.Response.data.available.length) {
-					return dfd.resolve(data.Response.data.available);
+			function(res) {
+				if(res.data && res.data.available && res.data.available.length) {
+					return dfd.resolve(res.data.available);
 				} else {
 					dfd.reject(errNoResponseFromBungie);
 				}
@@ -442,8 +367,71 @@ $(function() {
 			vogCompletionText += 'Incomplete';
 		}
 		div.append($('<span/>').text(heroicCompletionText + ', '))
-			.append($('<span/>').text(nightfallCompletionText))
+			.append($('<span/>').text(nightfallCompletionText));
 			// .append($('<span/>').text(vogCompletionText)); TODO gotta figure out how raid progress/completion works
+	}
+
+	function getProgress(characterBase) {
+		var dfd = new $.Deferred(),
+			accountType = 'TigerPSN';
+
+		if(characterBase.membershipType === 1) {
+			accountType = 'TigerXbox';
+		}
+
+		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression/',
+			function(res) {
+				if(res.data && res.data.progressions && res.data.progressions.length) {
+					return dfd.resolve(res.data.progressions);
+				} else {
+					dfd.reject(errNoResponseFromBungie);
+				}
+			},
+			function(err) {
+				dfd.reject(err);
+			}
+		);
+		return dfd;
+	}
+
+	function showMessage(msg) {
+		if(!msg) {
+			return;
+		}
+		if(typeof msg === 'string') {
+			msg = {text:msg};
+		}
+		if(msg.level === 'info') {
+			message.css('color','');
+		} else {
+			message.css('color','#a94442');
+		}
+		if(msg.text) {
+			message.text(msg.text);
+		} else {
+			message.text('unknown error');
+		}
+	}
+
+	function showError(err) {
+		if(typeof err === 'string') {
+			err = {text:err};
+		}
+		err.level = 'error';
+		showMessage(err);
+	}
+
+	button.on('click', function() {
+		var username = textInput.val().replace(/\s/g, '');
+		textInput.val(username);
+		if(!username) {
+			return;
+		}
+		updateHash();
+	});
+
+	function updateHash() {
+		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
 	}
 
 	function buildProgressBar(progressionData) {
