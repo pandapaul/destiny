@@ -1,6 +1,7 @@
 {
   "name": "destiny-search",
   "subdomain": "destiny-search",
+  "repository": "https://github.com/pandapaul/destiny.git",
   "scripts": {
     "start": "node server.js"
   },
