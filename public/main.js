@@ -367,8 +367,8 @@ $(function() {
 			vogCompletionText += 'Incomplete';
 		}
 		div.append($('<span/>').text(heroicCompletionText + ', '))
-			.append($('<span/>').text(nightfallCompletionText));
-			// .append($('<span/>').text(vogCompletionText)); TODO gotta figure out how raid progress/completion works
+			.append($('<span/>').text(nightfallCompletionText))
+			.append($('<div/>').text(vogCompletionText));
 	}
 
 	function getProgress(characterBase) {
@@ -454,8 +454,8 @@ $(function() {
 				.attr('aria-valuemax',progressionData.nextLevelAt)
 				.attr('aria-valuemin','0')
 				.width(progressionData.progressToNextLevel/progressionData.nextLevelAt*100 + '%')
-				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt)
-				.css('padding-left','3px');
+				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt),
+			dailyProgress = Math.min(progressionData.progressToNextLevel, progressionData.dailyProgress);
 		progress.append(progressbar);
 		description.append(faction, rank);
 		return container.append(description, progress);
@@ -478,8 +478,7 @@ $(function() {
 				.attr('aria-valuemax',100)
 				.attr('aria-valuemin','0')
 				.width(progressionData.level + '%')
-				.text(progressionData.level + '/100')
-				.css('padding-left','3px');
+				.text(progressionData.level + '/100');
 		progress.append(progressbar);
 		description.append(title);
 		return container.append(description, progress);

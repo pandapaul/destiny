@@ -93,6 +93,10 @@ a {
 	background-color: rgb(93,164,105);
 	color: #222;
 	font-size: 14px;
+	padding-left: 5px;
+}
+.progress-bar-daily {
+	background-color: rgb(93,105,164);
 }
 .progress-container {
 	margin-top:10px;
