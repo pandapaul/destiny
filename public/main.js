@@ -438,7 +438,7 @@ $(function() {
 		var container = $('<div/>')
 				.addClass('progress-container'),
 			description = $('<div/>')
-				.addClass('progress-description container clearfix'),
+				.addClass('progress-description clearfix'),
 			faction = $('<div/>')
 				.addClass('pull-left')
 				.text(hashes[progressionData.progressionHash]),
@@ -455,17 +455,32 @@ $(function() {
 				.attr('aria-valuemin','0')
 				.width(progressionData.progressToNextLevel/progressionData.nextLevelAt*100 + '%')
 				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt),
-			dailyProgress = Math.min(progressionData.progressToNextLevel, progressionData.dailyProgress);
+			progressDetails = $('<div/>')
+				.addClass('progress-details')
+				.css('display','none'),
+			progressToday = $('<div/>')
+				.text('Today: ' + progressionData.dailyProgress)
+				.appendTo(progressDetails),
+			progressThisWeek = $('<div/>')
+				.text('This Week: ' + progressionData.weeklyProgress)
+				.appendTo(progressDetails),
+			progressLifetime = $('<div/>')
+				.text('Lifetime: ' + progressionData.currentProgress)
+				.appendTo(progressDetails);
+		container.on('click', function() {
+			progressDetails.toggle();
+			container.toggleClass('progress-container-selected');
+		});
 		progress.append(progressbar);
 		description.append(faction, rank);
-		return container.append(description, progress);
+		return container.append(description, progress, progressDetails);
 	}
 
 	function buildMarksBar(progressionData) {
 		var container = $('<div/>')
 				.addClass('progress-container'),
 			description = $('<div/>')
-				.addClass('progress-description container clearfix'),
+				.addClass('progress-description clearfix'),
 			title = $('<div/>')
 				.addClass('pull-left')
 				.text(hashes.weeklyMarks[progressionData.progressionHash]),
@@ -478,10 +493,23 @@ $(function() {
 				.attr('aria-valuemax',100)
 				.attr('aria-valuemin','0')
 				.width(progressionData.level + '%')
-				.text(progressionData.level + '/100');
+				.text(progressionData.level + '/100'),
+			progressDetails = $('<div/>')
+				.addClass('progress-details')
+				.css('display','none'),
+			progressToday = $('<div/>')
+				.text('Today: ' + progressionData.dailyProgress)
+				.appendTo(progressDetails),
+			progressLastWeek = $('<div/>')
+				.text('Last Week: ' + (progressionData.level - progressionData.weeklyProgress))
+				.appendTo(progressDetails);
+		container.on('click', function() {
+			progressDetails.toggle();
+			container.toggleClass('progress-container-selected');
+		});
 		progress.append(progressbar);
 		description.append(title);
-		return container.append(description, progress);
+		return container.append(description, progress, progressDetails);
 	}
 
 	function updateFormFromHash() {
