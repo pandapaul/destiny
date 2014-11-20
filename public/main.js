@@ -120,8 +120,7 @@ $(function() {
 		startLoading();
 		searchForMembership(textInput.val())
 		.done(function(res){
-			var member = {},
-				mostRecentResetDate = getDateOfMostRecentReset();
+			var member = {};
 			for(var i=0;i<res.length;i++) {
 				if(res[i].membershipType === selectedAccountType) {
 					member = res[i];
@@ -131,7 +130,7 @@ $(function() {
 			getCharacterIds(member)
 			.done(function(res) {
 				for(var i=0;i<res.data.characters.length;i++) {
-					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1, mostRecentResetDate);
+					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1);
 				}
 			})
 			.fail(function(err) {
@@ -207,7 +206,21 @@ $(function() {
 		}
 	}
 
-	function loadCharacterInfo(character, isLastCharacter, mostRecentResetDate) {
+	function getDateOfMostRecentDailyReset() {
+		var date = new Date();
+		if(date.getUTCHours() < 9) {
+			date.setUTCDate(date.getUTCDate() - 1);
+		}
+		date.setUTCHours(9);
+		date.setUTCMinutes(0);
+		date.setUTCSeconds(0);
+		date.setUTCMilliseconds(0);
+		return date;
+	}
+
+	function loadCharacterInfo(character, isLastCharacter) {
+		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
+			mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
 		getCurrency(character.characterBase)
 		.done(function (res) {
@@ -225,8 +238,9 @@ $(function() {
 					.addClass('character-weekly-marks')
 					.appendTo(d),
 				characterDate = new Date(character.characterBase.dateLastPlayed),
-				playedSinceReset = characterDate - mostRecentResetDate > 0;
-			if(playedSinceReset) {
+				playedSinceWeeklyReset = characterDate - mostRecentWeeklyReset > 0;
+				playedSinceDailyReset = characterDate - mostRecentDailyReset > 0;
+			if(playedSinceWeeklyReset) {
 				getActivities(character.characterBase)
 				.done(function (res) {
 					showActivityCompletion(a, res);
@@ -237,10 +251,13 @@ $(function() {
 			getProgress(character.characterBase)
 			.done(function (res) {
 				for(var i=0;i<res.length;i++) {
+					res[i].characterDate = characterDate;
+					res[i].playedSinceWeeklyReset = playedSinceWeeklyReset;
+					res[i].playedSinceDailyReset = playedSinceDailyReset;
 					if(hashes[res[i].progressionHash]) {
 						d.append(buildProgressBar(res[i]));
 					} else if(hashes.weeklyMarks[res[i].progressionHash]) {
-						if(!playedSinceReset) {
+						if(!playedSinceWeeklyReset) {
 							res[i].level = 0;
 						}
 						w.append(buildMarksBar(res[i]));
@@ -261,7 +278,7 @@ $(function() {
 		});
 	}
 
-	function getDateOfMostRecentReset() {
+	function getDateOfMostRecentWeeklyReset() {
 		var date = new Date();
 		var currentDayOfWeek = date.getUTCDay();
 		var distanceToMostRecentTuesday = currentDayOfWeek - 2;
@@ -435,6 +452,15 @@ $(function() {
 	}
 
 	function buildProgressBar(progressionData) {
+		var adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
+			adjustedWeeklyLabel = 'That Week';
+		if(progressionData.playedSinceWeeklyReset) {
+			adjustedLevel = progressionData.level;
+			adjustedWeeklyLabel = 'This Week';
+		}
+		if(progressionData.playedSinceDailyReset) {
+			adjustedDailyLabel = 'Today';
+		}
 		var container = $('<div/>')
 				.addClass('progress-container'),
 			description = $('<div/>')
@@ -459,10 +485,10 @@ $(function() {
 				.addClass('progress-details')
 				.css('display','none'),
 			progressToday = $('<div/>')
-				.text('Today: ' + progressionData.dailyProgress)
+				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
 				.appendTo(progressDetails),
 			progressThisWeek = $('<div/>')
-				.text('This Week: ' + progressionData.weeklyProgress)
+				.text(adjustedWeeklyLabel + ': ' + progressionData.weeklyProgress)
 				.appendTo(progressDetails),
 			progressLifetime = $('<div/>')
 				.text('Lifetime: ' + progressionData.currentProgress)
@@ -477,6 +503,16 @@ $(function() {
 	}
 
 	function buildMarksBar(progressionData) {
+		var adjustedLevel = 0,
+			adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
+			adjustedWeeklyLabel = 'Week Before';
+		if(progressionData.playedSinceWeeklyReset) {
+			adjustedLevel = progressionData.level;
+			adjustedWeeklyLabel = 'Last Week';
+		}
+		if(progressionData.playedSinceDailyReset) {
+			adjustedDailyLabel = 'Today';
+		}
 		var container = $('<div/>')
 				.addClass('progress-container'),
 			description = $('<div/>')
@@ -489,19 +525,19 @@ $(function() {
 			progressbar = $('<div/>')
 				.addClass('progress-bar')
 				.attr('role','progressbar')
-				.attr('aria-valuenow',progressionData.level)
+				.attr('aria-valuenow',adjustedLevel)
 				.attr('aria-valuemax',100)
 				.attr('aria-valuemin','0')
-				.width(progressionData.level + '%')
-				.text(progressionData.level + '/100'),
+				.width(adjustedLevel + '%')
+				.text(adjustedLevel + '/100'),
 			progressDetails = $('<div/>')
 				.addClass('progress-details')
 				.css('display','none'),
 			progressToday = $('<div/>')
-				.text('Today: ' + progressionData.dailyProgress)
+				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
 				.appendTo(progressDetails),
 			progressLastWeek = $('<div/>')
-				.text('Last Week: ' + (progressionData.level - progressionData.weeklyProgress))
+				.text(adjustedWeeklyLabel + ': ' + Math.abs(adjustedLevel - progressionData.weeklyProgress))
 				.appendTo(progressDetails);
 		container.on('click', function() {
 			progressDetails.toggle();
