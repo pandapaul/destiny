@@ -3,45 +3,6 @@ var express = require('express'),
 	app = express(),
 	request = require('request');
 
-var fs = require('fs');
-
-function incrementViewCount(req, res, next) {
-	fs.readFile('viewCount.json', function(err, data) {
-		var viewData = {count:1, timestamp: new Date()};
-		if(!err) {
-			try {
-				viewData = JSON.parse(data);
-				viewData.count++;
-			}
-			catch(e) {
-				viewData = {count:1, timestamp: new Date()};
-			}
-		}
-		output = JSON.stringify(viewData);
-		fs.writeFile('viewCount.json', output, function(err) {
-			next();
-		});
-	});
-}
-
-function getViewCount(req, res) {
-	fs.readFile('viewCount.json', function(err, data) {
-		if (!err) {
-			try {
-				var viewData = JSON.parse(data);
-				res.write(viewData.count + ' views since ' + viewData.timestamp);
-				res.end();
-			}
-			catch(e) {
-				res.send('data read error');
-			}
-		}
-		else {
-			res.send('no data');
-		}
-	});
-}
-
 function proxyJSON(req, res) {
 
 	if(!req.body.targetUrl) {
@@ -72,10 +33,8 @@ function redirectIfNeeded(req, res, next) {
 }
 
 app.get('/', redirectIfNeeded);
-app.get('/', incrementViewCount);
 app.use(express.static('public'));
 app.use(bodyParser.json());
-app.get('/viewcount', getViewCount);
 app.post('/proxyJSON', proxyJSON);
 
 var listenPort = process.env.PORT || 5000;
