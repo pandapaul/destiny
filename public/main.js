@@ -30,6 +30,7 @@ $(function() {
 			1357277120: 'Crucible',
 			2778795080: 'Dead Orbit',
 			1424722124: 'Future War Cult',
+			174528503: 'Eris Morn',
 			weeklyMarks: {
 				2033897742: 'Weekly Vanguard Marks',
 				2033897755: 'Weekly Crucible Marks'
