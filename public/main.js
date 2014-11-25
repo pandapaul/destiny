@@ -99,24 +99,6 @@ $(function() {
 	    return vars;
 	}
 
-	function jsonp(url, success, failure) {
-		$.ajax({
-			type: 'POST',
-			url: '/proxyJSON',
-			data: JSON.stringify({targetUrl: url}),
-			contentType:'application/json; charset=utf-8',
-			dataType: 'json'
-		}).done(function(data) {
-			if(data && data.Response) {
-				success(data.Response);
-			} else {
-				failure(errNoResponseFromBungie);
-			}
-		}).fail(function () {
-			failure(errUnableToConnect);
-		});
-	}
-
 	function performSearch() {
 		startLoading();
 		searchForMembership(textInput.val())
@@ -157,54 +139,6 @@ $(function() {
 		}
 		button.attr('disabled',false);
 		results.show();
-	}
-
-	function searchForMembership(username) {
-		var dfd = new $.Deferred();
-		jsonp('http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
-			function(res) {
-				handleSearchResponse(res, dfd);
-			},
-			function(error) {
-				dfd.reject(error);
-			}
-		);
-		return dfd;
-	}
-
-	function handleSearchResponse(res, dfd) {
-		if(res.length < 1) {
-			dfd.reject(errNoMatchesFound);
-		} else {
-			dfd.resolve(res);
-		}
-	}
-
-	function getCharacterIds(member) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(member.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + member.membershipId + '/',
-			function(res) {
-				handleCharacterIdsResponse(res, dfd);
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
-	}
-
-	function handleCharacterIdsResponse(res, dfd) {
-		if(!res.data || !res.data.characters || res.data.characters.length < 1) {
-			dfd.reject(errNoCharactersFound);
-		} else {
-			dfd.resolve(res);
-		}
 	}
 
 	function getDateOfMostRecentDailyReset() {
@@ -294,52 +228,6 @@ $(function() {
 		return date;
 	}
 
-	function getCurrency(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory/',
-			function(res) {
-				if(res.data && res.data.currencies && res.data.currencies.length) {
-					dfd.resolve(res.data.currencies);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
-	}
-
-	function getActivities(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Activities/',
-			function(res) {
-				if(res.data && res.data.available && res.data.available.length) {
-					return dfd.resolve(res.data.available);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
-	}
-
 	function showActivityCompletion(div, data) {
 		var activity = null,
 			heroic = null,
@@ -387,29 +275,6 @@ $(function() {
 		div.append($('<span/>').text(heroicCompletionText + ', '))
 			.append($('<span/>').text(nightfallCompletionText))
 			.append($('<div/>').text(vogCompletionText));
-	}
-
-	function getProgress(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression/',
-			function(res) {
-				if(res.data && res.data.progressions && res.data.progressions.length) {
-					return dfd.resolve(res.data.progressions);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
 	}
 
 	function showMessage(msg) {
