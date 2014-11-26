@@ -161,7 +161,7 @@ function Searcher(username, accountType) {
 		return function(details) {
 			character.inventory = details.inventory;
 			character.activities = details.activities;
-			character.progression = details.progression;
+			character.progressions = details.progressions;
 			self.characterDetailsCompletion[characterIndex] = true;
 			if(characterDetailsFetchingIsComplete()) {
 				finish();
@@ -200,7 +200,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	self.fetch = function() {
 		getInventory();
 		getActivities();
-		getProgression();
+		getProgressions();
 	};
 
 	self.finished = function(callback) {
@@ -213,12 +213,10 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function handleInventoryResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body)) {
-			if(body.Response.data) {
-				self.result.inventory = {
-					currencies: body.Response.data.currencies
-				};
-			}
+		if(bungieResponseIsValid(error, body) && body.Response.data) {
+			self.result.inventory = {
+				currencies: body.Response.data.currencies
+			};
 		}
 		self.completion.inventory = true;
 		finishIfComplete();
@@ -230,32 +228,36 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function handleActivitiesResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body)) {
-			if(body.Response.data) {
-				self.result.activites = body.Response.data.activities;
+		if(bungieResponseIsValid(error, body) && body.Response.data) {
+			self.result.activities = [];
+			var activities = body.Response.data.available;
+			for(var i=0; i < activities.length; i++) {
+				self.result.activities.push({
+					activityHash: activities[i].activityHash,
+					isCompleted: activities[i].isCompleted
+				});
 			}
+			self.result.activites = body.Response.data.available;
 		}
 		self.completion.activities = true;
 		finishIfComplete();
 	}
 
-	function getProgression() {
+	function getProgressions() {
 		var url = self.characterUrl + 'Progression/';
 		requestJson({url:url}, handleProgressionResponse);
 	}
 
 	function handleProgressionResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body)) {
-			if(body.Response.data) {
-				self.result.progression = body.Response.data.progression;
-			}
+		if(bungieResponseIsValid(error, body) && body.Response.data) {
+			self.result.progressions = body.Response.data.progressions;
 		}
-		self.completion.progression = true;
+		self.completion.progressions = true;
 		finishIfComplete();
 	}
 
 	function finishIfComplete() {
-		if(self.completion.inventory && self.completion.activities && self.completion.progression) {
+		if(self.completion.inventory && self.completion.activities && self.completion.progressions) {
 			finish();
 		}
 	}
