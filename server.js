@@ -13,6 +13,7 @@ function initializeBungieStuff() {
 		1: 'TigerXbox',
 		2: 'TigerPSN'
 	};
+	bungieStuff.url = 'http://www.bungie.net/Platform/Destiny/';
 }
 
 function setupRoutesAndMiddleware() {
@@ -59,6 +60,7 @@ function Searcher(username, accountType) {
 	self.username = username;
 	self.accountType = accountType;
 	self.result = {};
+	self.response = {};
 
 	self.search = function() {
 		searchForMembership();
@@ -69,22 +71,30 @@ function Searcher(username, accountType) {
 	};
 
 	function searchForMembership() {
-		var url = 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + self.accountType + '/' + self.username + '/';
+		var url = bungieStuff.url + 'SearchDestinyPlayer/' + self.accountType + '/' + self.username + '/';
 		requestJson({url: url}, handleSearchResponse);
 	}
 
 	function handleSearchResponse(error, response, body) {
-		if(error || !body || !body.Response) {
+		if(bungieResponded(error, body)) {
+			if(body.Response.length < 1) {
+				self.result.error = 'no matches found';
+				finish();
+			} else {
+				self.response = body.Response[0];
+				mapResponseToResultMembership();
+				getCharacters();
+			}
+		}
+	}
+
+	function bungieResponded(error, body) {
+		var valid = bungieResponseIsValid(error, body);
+		if(!valid) {
 			self.result.error = 'no response from Bungie';
 			finish();
-		} else if(body.Response.length < 1) {
-			self.result.error = 'no matches found';
-			finish();
-		} else {
-			self.response = body.Response[0];
-			mapResponseToResultMembership();
-			getCharacters();
 		}
+		return valid;
 	}
 
 	function mapResponseToResultMembership() {
@@ -97,92 +107,70 @@ function Searcher(username, accountType) {
 	}
 
 	function getCharacters() {
-		var url = 'http://www.bungie.net/Platform/Destiny/' + self.membershipPlatform + '/Account/' + self.result.membership.id + '/';
+		var url = bungieStuff.url + self.membershipPlatform + '/Account/' + self.result.membership.id + '/';
 		requestJson({url:url}, handleCharactersResponse);
 	}
-	//TODO write a reusable bungie response handler
+
 	function handleCharactersResponse(error, response, body) {
-		if(error || !body || !body.Response) {
-			self.result.error = 'no response from Bungie';
-			finish();
-		} else {
-			self.response = body.Response.data;
-			mapResponseToResultCharacters();
-			finish();
+		if(bungieResponded(error, body)) {
+			if(body.Response.data && body.Response.data.characters && body.Response.data.characters.length) {
+				self.response = body.Response.data;
+				mapResponseToResultCharacters();
+				getCharacterDetails();
+			} else {
+				self.result.error = 'no characters found';
+				finish();
+			}
 		}
 	}
 
 	function mapResponseToResultCharacters() {
-		self.result.characters = self.response.characters;
+		var characters = [];
+		for (var i=0; i < self.response.characters.length; i++) {
+			var character = {},
+				resCharacter = self.response.characters[i];
+			character.id = resCharacter.characterBase.characterId;
+			character.dateLastPlayed = resCharacter.characterBase.dateLastPlayed;
+			character.minutesPlayedThisSession = resCharacter.characterBase.minutesPlayedThisSession;
+			character.minutesPlayedTotal = resCharacter.characterBase.minutesPlayedTotal;
+			character.level = resCharacter.characterBase.powerLevel;
+			character.raceHash = resCharacter.characterBase.raceHash;
+			character.genderHash = resCharacter.characterBase.genderHash;
+			character.classHash = resCharacter.characterBase.classHash;
+			characters.push(character);
+		}
+		self.result.characters = characters;
 	}
 
-	function getCurrency(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
+	function getCharacterDetails() {
+		var detailsFetcher;
+		self.characterDetailsCompletion = [];
+		for(var i=0; i < self.result.characters.length; i++) {
+			detailsFetcher = new CharacterDetailsFetcher(getCharacterUrl(i));
+			detailsFetcher.fetch();
+			detailsFetcher.finished(getDetailsResultHandler(i));
 		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Inventory/',
-			function(res) {
-				if(res.data && res.data.currencies && res.data.currencies.length) {
-					dfd.resolve(res.data.currencies);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
 	}
 
-	function getActivities(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Activities/',
-			function(res) {
-				if(res.data && res.data.available && res.data.available.length) {
-					return dfd.resolve(res.data.available);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
+	function getCharacterUrl(characterIndex) {
+		return bungieStuff.url + self.membershipPlatform + '/Account/' + self.result.membership.id + '/Character/' + self.result.characters[characterIndex].id + '/';
 	}
 
-	function getProgress(characterBase) {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(characterBase.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + characterBase.membershipId + '/Character/' + characterBase.characterId + '/Progression/',
-			function(res) {
-				if(res.data && res.data.progressions && res.data.progressions.length) {
-					return dfd.resolve(res.data.progressions);
-				} else {
-					dfd.reject(errNoResponseFromBungie);
-				}
-			},
-			function(err) {
-				dfd.reject(err);
+	function getDetailsResultHandler(characterIndex) {
+		var character = self.result.characters[characterIndex];
+		return function(details) {
+			character.inventory = details.inventory;
+			character.activities = details.activities;
+			character.progression = details.progression;
+			self.characterDetailsCompletion[characterIndex] = true;
+			if(characterDetailsFetchingIsComplete()) {
+				finish();
 			}
-		);
-		return dfd;
+		};
+	}
+
+	function characterDetailsFetchingIsComplete() {
+		return self.characterDetailsCompletion.length >= self.result.characters.length;
 	}
 
 	function finish() {
@@ -191,13 +179,93 @@ function Searcher(username, accountType) {
 			self.finishedCallback = null;
 		}
 	}
-
 }
 
 function requestJson(options, callback) {
 	options = options || {};
 	options.json = true;
 	return request(options, callback);
+}
+
+function bungieResponseIsValid(error, body) {
+	return !error && body && body.Response;
+}
+
+function CharacterDetailsFetcher(characterUrl) {
+	var self = this;
+	self.characterUrl = characterUrl;
+	self.completion = {};
+	self.result = {};
+
+	self.fetch = function() {
+		getInventory();
+		getActivities();
+		getProgression();
+	};
+
+	self.finished = function(callback) {
+		self.finishedCallback = callback;
+	};
+
+	function getInventory() {
+		var url = self.characterUrl + 'Inventory/';
+		requestJson({url:url}, handleInventoryResponse);
+	}
+
+	function handleInventoryResponse(error, response, body) {
+		if(bungieResponseIsValid(error, body)) {
+			if(body.Response.data) {
+				self.result.inventory = {
+					currencies: body.Response.data.currencies
+				};
+			}
+		}
+		self.completion.inventory = true;
+		finishIfComplete();
+	}
+
+	function getActivities() {
+		var url = self.characterUrl + 'Activities/';
+		requestJson({url:url}, handleActivitiesResponse);
+	}
+
+	function handleActivitiesResponse(error, response, body) {
+		if(bungieResponseIsValid(error, body)) {
+			if(body.Response.data) {
+				self.result.activites = body.Response.data.activities;
+			}
+		}
+		self.completion.activities = true;
+		finishIfComplete();
+	}
+
+	function getProgression() {
+		var url = self.characterUrl + 'Progression/';
+		requestJson({url:url}, handleProgressionResponse);
+	}
+
+	function handleProgressionResponse(error, response, body) {
+		if(bungieResponseIsValid(error, body)) {
+			if(body.Response.data) {
+				self.result.progression = body.Response.data.progression;
+			}
+		}
+		self.completion.progression = true;
+		finishIfComplete();
+	}
+
+	function finishIfComplete() {
+		if(self.completion.inventory && self.completion.activities && self.completion.progression) {
+			finish();
+		}
+	}
+
+	function finish() {
+		if(self.finishedCallback) {
+			self.finishedCallback(self.result);
+			self.finishedCallback = null;
+		}
+	}
 }
 
 function Stasher(data) {
