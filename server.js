@@ -1,10 +1,19 @@
 var express = require('express'),
 	bodyParser = require('body-parser'),
 	app = express(),
-	request = require('request');
+	request = require('request'),
+	bungieStuff = {};
 
+initializeBungieStuff();
 setupRoutesAndMiddleware();
 listen();
+
+function initializeBungieStuff() {
+	bungieStuff.membershipPlatforms = {
+		1: 'TigerXbox',
+		2: 'TigerPSN'
+	};
+}
 
 function setupRoutesAndMiddleware() {
 	app.get('/', redirectIfNeeded);
@@ -65,49 +74,46 @@ function Searcher(username, accountType) {
 	}
 
 	function handleSearchResponse(error, response, body) {
-		if(body.Response.length < 1) {
-			self.result.error = new Error('no matches found');
+		if(error || !body || !body.Response) {
+			self.result.error = 'no response from Bungie';
+			finish();
+		} else if(body.Response.length < 1) {
+			self.result.error = 'no matches found';
 			finish();
 		} else {
-			self.response = response;
-			mapMembershipToResult();
-			getCharacterIds();
+			self.response = body.Response[0];
+			mapResponseToResultMembership();
+			getCharacters();
 		}
 	}
 
-	function mapMembershipToResult() {
+	function mapResponseToResultMembership() {
 		var membership = {};
 		membership.type = self.response.membershipType;
 		membership.id = self.response.membershipId;
 		membership.displayName = self.response.displayName;
 		self.result.membership = membership;
+		self.membershipPlatform = bungieStuff.membershipPlatforms[membership.type];
 	}
 
-	function getCharacterIds() {
-		var dfd = new $.Deferred(),
-			accountType = 'TigerPSN';
-
-		if(member.membershipType === 1) {
-			accountType = 'TigerXbox';
-		}
-
-		jsonp('http://www.bungie.net/Platform/Destiny/' + accountType + '/Account/' + member.membershipId + '/',
-			function(res) {
-				handleCharacterIdsResponse(res, dfd);
-			},
-			function(err) {
-				dfd.reject(err);
-			}
-		);
-		return dfd;
+	function getCharacters() {
+		var url = 'http://www.bungie.net/Platform/Destiny/' + self.membershipPlatform + '/Account/' + self.result.membership.id + '/';
+		requestJson({url:url}, handleCharactersResponse);
 	}
-
-	function handleCharacterIdsResponse(res, dfd) {
-		if(!res.data || !res.data.characters || res.data.characters.length < 1) {
-			dfd.reject(errNoCharactersFound);
+	//TODO write a reusable bungie response handler
+	function handleCharactersResponse(error, response, body) {
+		if(error || !body || !body.Response) {
+			self.result.error = 'no response from Bungie';
+			finish();
 		} else {
-			dfd.resolve(res);
+			self.response = body.Response.data;
+			mapResponseToResultCharacters();
+			finish();
 		}
+	}
+
+	function mapResponseToResultCharacters() {
+		self.result.characters = self.response.characters;
 	}
 
 	function getCurrency(characterBase) {
