@@ -3,6 +3,22 @@ var express = require('express'),
 	app = express(),
 	request = require('request');
 
+setupRoutesAndMiddleware();
+listen();
+
+function setupRoutesAndMiddleware() {
+	app.get('/', redirectIfNeeded);
+	app.use(express.static('public'));
+	app.use(bodyParser.json());
+	app.post('/search', search);
+}
+
+function listen() {
+	var listenPort = process.env.PORT || 5000;
+	app.listen(listenPort);
+	console.log('Listening on port ' + listenPort);
+}
+
 function redirectIfNeeded(req, res, next) {
 	if(req.header('host').indexOf('herokuapp.com') > -1) {
 		res.redirect(301, 'http://www.destinyrep.com');
@@ -21,53 +37,53 @@ function search(req, res) {
 		return;
 	}
 
-	var searchResult = new Searcher(req.body.username, req.body.accountType).search();
-	new Stasher(searchResult).stash();
-
-	res.json(searchResult);
+	var searcher = new Searcher(req.body.username, req.body.accountType);
+	searcher.search();
+	searcher.finished(function(searchResult) {
+		new Stasher(searchResult).stash();
+		res.json(searchResult);
+	});
 }
 
 function Searcher(username, accountType) {
-	this.username = username;
-	this.accountType = accountType;
+	var self = this;
+	self.username = username;
+	self.accountType = accountType;
+	self.result = {};
 
-	var result = {};
-
-	this.search = function() {
+	self.search = function() {
 		searchForMembership();
-		getCharacterIds();
-		getCurrency();
-		getActivities();
-		getProgress();
-		return result;
+	};
+
+	self.finished = function(callback) {
+		self.finishedCallback = callback;
 	};
 
 	function searchForMembership() {
-
-		request({
-			url: 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + selectedAccountType + '/' + username + '/',
-			json: true
-		}, function (error, response, body) {
-			if (error) {
-				throw error;
-			}
-			if (response.statusCode === 200) {
-					
-			} else {
-				throw new Error('No response from Bungie');
-			}
-		});
+		var url = 'http://www.bungie.net/Platform/Destiny/SearchDestinyPlayer/' + self.accountType + '/' + self.username + '/';
+		requestJson({url: url}, handleSearchResponse);
 	}
 
-	function handleSearchResponse(res, dfd) {
-		if(res.length < 1) {
-			dfd.reject(errNoMatchesFound);
+	function handleSearchResponse(error, response, body) {
+		if(body.Response.length < 1) {
+			self.result.error = new Error('no matches found');
+			finish();
 		} else {
-			dfd.resolve(res);
+			self.response = response;
+			mapMembershipToResult();
+			getCharacterIds();
 		}
 	}
 
-	function getCharacterIds(member) {
+	function mapMembershipToResult() {
+		var membership = {};
+		membership.type = self.response.membershipType;
+		membership.id = self.response.membershipId;
+		membership.displayName = self.response.displayName;
+		self.result.membership = membership;
+	}
+
+	function getCharacterIds() {
 		var dfd = new $.Deferred(),
 			accountType = 'TigerPSN';
 
@@ -163,20 +179,25 @@ function Searcher(username, accountType) {
 		return dfd;
 	}
 
+	function finish() {
+		if(self.finishedCallback) {
+			self.finishedCallback(self.result);
+			self.finishedCallback = null;
+		}
+	}
+
+}
+
+function requestJson(options, callback) {
+	options = options || {};
+	options.json = true;
+	return request(options, callback);
 }
 
 function Stasher(data) {
-	this.data = data;
-	this.stash = function() {
+	var self = this;
+	self.data = data;
+	self.stash = function() {
 		//TODO stash the data in a database
 	};
 }
-
-app.get('/', redirectIfNeeded);
-app.use(express.static('public'));
-app.use(bodyParser.json());
-app.post('/search', search);
-
-var listenPort = process.env.PORT || 5000;
-app.listen(listenPort);
-console.log('Listening on port ' + listenPort);
