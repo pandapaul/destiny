@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "express": "4.9.5",
-    "body-parser": "1.9.0"
+    "body-parser": "1.9.0",
+    "mongodb":"1.4.22",
+    "request":"2.45.0"
   }
 }

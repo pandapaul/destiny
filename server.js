@@ -1,7 +1,8 @@
 var express = require('express'),
 	bodyParser = require('body-parser'),
-	app = express(),
 	request = require('request'),
+	mongo = require('mongodb'),
+	app = express(),
 	bungieStuff = {};
 
 initializeBungieStuff();
@@ -42,12 +43,12 @@ function search(req, res) {
 		res.json({error:'missing username'});
 		return;
 	}
-	if(!req.body.accountType) {
-		res.json({error:'missing accountType'});
+	if(!req.body.membershipType) {
+		res.json({error:'missing membershipType'});
 		return;
 	}
 
-	var searcher = new Searcher(req.body.username, req.body.accountType);
+	var searcher = new Searcher(req.body.username, req.body.membershipType);
 	searcher.search();
 	searcher.finished(function(searchResult) {
 		new Stasher(searchResult).stash();
@@ -55,10 +56,10 @@ function search(req, res) {
 	});
 }
 
-function Searcher(username, accountType) {
+function Searcher(username, membershipType) {
 	var self = this;
 	self.username = username;
-	self.accountType = accountType;
+	self.membershipType = membershipType;
 	self.result = {};
 	self.response = {};
 
@@ -71,7 +72,7 @@ function Searcher(username, accountType) {
 	};
 
 	function searchForMembership() {
-		var url = bungieStuff.url + 'SearchDestinyPlayer/' + self.accountType + '/' + self.username + '/';
+		var url = bungieStuff.url + 'SearchDestinyPlayer/' + self.membershipType + '/' + self.username + '/';
 		requestJson({url: url}, handleSearchResponse);
 	}
 
@@ -270,10 +271,36 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 }
 
+console.log();
+
 function Stasher(data) {
 	var self = this;
 	self.data = data;
 	self.stash = function() {
-		//TODO stash the data in a database
+		try {
+			connect();
+		} catch(err) {
+			console.log(err);
+		}
 	};
+
+	function connect() {
+		mongo.MongoClient.connect(process.env.MONGOLAB_URI || 'mongodb://heroku_app30494315:4r32lkr8kaqj5cgdk5lufohujt@ds051740.mongolab.com:51740/heroku_app30494315', function(err, db) {
+		  if(err) {
+		  	throw err;
+		  }
+		  self.db = db;
+		});
+	}
+
+	function disconnect() {
+		if(!self.db) {
+			throw 'Stasher: db not set. Connect first.';
+		}
+		self.db.close();
+	}
+
+	function upsert() {
+		
+	}
 }
