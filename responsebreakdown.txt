@@ -1,0 +1,53 @@
+Things I want from the character response
+
+Response
+	data		
+		characters[i]
+			characterBase
+				characterId
+				dateLastPlayed
+				minutesPlayedThisSession
+				minutesPlayedTotal
+				raceHash
+				genderHash
+				classHash
+				powerLevel
+
+
+Things I'm not going to use right now
+
+Response
+	data
+		characters[i]
+			characterBase
+				currentActivityHash
+				lastCompletedStoryHash
+				stats (defense, light, etc)
+				customization (face, hair, etc)
+				grimoireScore
+				peerView (equipment)
+				genderType
+				classType
+				buildStatGroupHash
+			levelProgression
+			emblemPath
+			backgroundPath
+			emblemHash
+			characterLevel
+			baseCharacterLevel
+			isPrestigeLevel
+			percentToNextLevel
+
+
+
+Things I want from the inventory response
+
+Response
+	data
+		currencies [{itemHash, value}]
+
+Things I dont' care about right now, but might later
+
+Response
+	data
+		buckets (has all the equipped inventory, talent grids, stats, & progression per item)
