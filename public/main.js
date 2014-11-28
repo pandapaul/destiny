@@ -148,19 +148,24 @@ $(function() {
 		}
 	}
 
+	//TODO gyahhhh cleanup
 	function displayCharacterData(character) {
 		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
 			mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
 		var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
 		
-		for(var i=0;i<character.inventory.currencies.length;i++) {
-			d.append(' ' + character.inventory.currencies[i].value + ' ' + hashes[character.inventory.currencies[i].itemHash]);
-			if(i<character.inventory.currencies.length-1) {
+		//currencies  TODO cleanup
+		var currencyCount = 0;
+		$.each(character.inventory.currencies, function(hash, currency) {
+			d.append(' ' + currency.value + ' ' + hashes[hash]);
+			currencyCount++;
+			if(currencyCount<3) {
 				d.append(',');
 			}
-		}
+		});
 
+		//TODO cleanup
 		var a = $('<div/>')
 				.addClass('character-activities')
 				.appendTo(d),
@@ -179,19 +184,21 @@ $(function() {
 		}
 
 		//show progression
-		for(i=0;i<character.progressions.length;i++) {
-			character.progressions[i].characterDate = characterDate;
-			character.progressions[i].playedSinceWeeklyReset = playedSinceWeeklyReset;
-			character.progressions[i].playedSinceDailyReset = playedSinceDailyReset;
-			if(hashes[character.progressions[i].progressionHash]) {
-				d.append(buildProgressBar(character.progressions[i]));
-			} else if(hashes.weeklyMarks[character.progressions[i].progressionHash]) {
+		//TODO cleanup
+		$.each(character.progressions, function(hash, progression) {
+			progression.characterDate = characterDate;
+			progression.playedSinceWeeklyReset = playedSinceWeeklyReset;
+			progression.playedSinceDailyReset = playedSinceDailyReset;
+			progression.progressionHash = hash;
+			if(hashes[hash]) {
+				d.append(buildProgressBar(progression));
+			} else if(hashes.weeklyMarks[hash]) {
 				if(!playedSinceWeeklyReset) {
-					character.progressions[i].level = 0;
+					progression.level = 0;
 				}
-				w.append(buildMarksBar(character.progressions[i]));
+				w.append(buildMarksBar(progression));
 			}
-		}
+		});
 
 		d.appendTo(characters);
 	}
@@ -223,31 +230,31 @@ $(function() {
 		return date;
 	}
 
-	function showActivityCompletion(div, data) {
+	function showActivityCompletion(div, activities) {
 		var activity = null,
 			heroic = null,
 			nightfall = null,
 			vog = null;
-		if(data) {
-			for(i=0;i<data.length;i++) {
-				if(data[i].isCompleted) {
-					activity = hashes.weeklyHeroics[data[i].activityHash];
+		if(activities) {
+			$.each(activities, function(hash, activity) {
+				if(activity.isCompleted) {
+					activity = hashes.weeklyHeroics[hash];
 					if((activity && !heroic) || (activity && heroic && activity.level > heroic.level)) {
 						heroic = activity;
-						continue;
+						return;
 					}
-					activity = hashes.weeklyNightfalls[data[i].activityHash];
+					activity = hashes.weeklyNightfalls[hash];
 					if(activity) {
 						nightfall = activity;
-						continue;
+						return;
 					}
-					activity = hashes.vaultOfGlass[data[i].activityHash];
+					activity = hashes.vaultOfGlass[hash];
 					if((activity && !vog) || (activity && vog && activity.level > vog.level)) {
 						vog = activity;
-						continue;
+						return;
 					}
 				}
-			}
+			});
 		}
 		var heroicCompletionText = 'Weekly Heroic ';
 		if(heroic) {

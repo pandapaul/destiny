@@ -311,8 +311,28 @@ function Stasher(data) {
 	}
 
 	function upsert() {
-		var condition = {'membership.id': self.data.membership.id};
-		self.dbHandler.upsert(condition, self.data, self.dbHandler.disconnect);
+		for(var i=0; i<self.data.characters.length; i++) {
+			upsertCharacter(self.data.characters[i]);
+		}
+	}
+
+	function upsertCharacter(character) {
+		character.membership = self.data.membership;
+		var condition = {
+			'id': character.id,
+			'membership.id': character.membership.id
+		};
+		self.dbHandler.upsert('characters', condition, character, trackUpsertProgress);
+	}
+
+	function trackUpsertProgress() {
+		if(!self.upsertProgress) {
+			self.upsertProgress = 0;
+		}
+		self.upsertProgress++;
+		if(self.upsertProgress >= self.data.characters.length) {
+			self.dbHandler.disconnect();
+		}
 	}
 }
 
@@ -335,18 +355,19 @@ function DatabaseConnectionHandler() {
 		}
 	};
 
-	self.upsert = function(condition, data, callback) {
-		self.db.collection('players').update(condition, data, {upsert:true}, callback);
+	self.upsert = function(collection, condition, data, callback) {
+		self.db.collection(collection).update(condition, data, {upsert:true}, callback);
 	};
 
-	self.find = function(condition, options, callback) {
-		self.db.collection('players').find(condition, options).toArray(callback);
+	self.find = function(collection, condition, options, callback) {
+		self.db.collection(collection).find(condition, options).toArray(callback);
 	};
 }
 
 function leaderboard(req, res) {
 	var currentProgressField = {};
-	var fetcher = new Fetcher({},{sort:{'characters.progressions.progressionHash.529303302':1}, fields:{'membership.displayName':1,'membership.id':1, 'character.id':1,'characters.progressions.529303302.progressionHash':1, 'characters.progressions.529303302.currentProgress':1}});
+	var fetcher = new Fetcher({},{sort:{'progressions.529303302.currentProgress':-1}, fields:{'_id':0, 'membership.displayName':1, 'membership.id':1, 'id':1, 'progressions.529303302.currentProgress':1}});
+	// var fetcher = new Fetcher();
 	fetcher.fetch();
 	fetcher.finished(function(docs) {
 		res.json(docs);
@@ -381,7 +402,7 @@ function Fetcher(condition, options) {
 	}
 
 	function find() {
-		self.dbHandler.find(self.condition, self.options, handleResult);
+		self.dbHandler.find('characters',self.condition, self.options, handleResult);
 	}
 
 	function handleResult(err, docs) {
