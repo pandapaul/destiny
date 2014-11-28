@@ -22,6 +22,7 @@ function setupRoutesAndMiddleware() {
 	app.use(express.static('public'));
 	app.use(bodyParser.json());
 	app.post('/search', search);
+	app.post('/leaderboard', leaderboard);
 }
 
 function listen() {
@@ -177,6 +178,7 @@ function Searcher(username, membershipType) {
 	}
 
 	function finish() {
+		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
@@ -288,7 +290,7 @@ function Stasher(data) {
 	};
 
 	function validate() {
-		if(!self.data || !self.data.membership || self.data.membership.id) {
+		if(!self.data || !self.data.membership || !self.data.membership.id) {
 			throw new Error('data has no membership id');
 		}
 	}
@@ -327,13 +329,18 @@ function DatabaseConnectionHandler() {
 	};
 }
 
-function Fetcher(callback, condition, options) {
+function leaderboard(req, res) {
+	var fetcher = new Fetcher();
+	res.json();
+}
+
+function Fetcher(condition, options) {
 	var self = this;
 	self.condition = condition;
 	self.options = options;
-	self.callback = callback;
 
-	self.fetch = function() {
+	self.fetch = function(callback) {
+		self.callback = callback;
 		try {
 			validate();
 			self.dbHandler = new DatabaseConnectionHandler();

@@ -5,11 +5,6 @@ $(function() {
 		characters = $('.characters'),
 		message = $('.message'),
 		selectedAccountType = 2,
-		errUnableToConnectToBungie = {text:'unable to connect to Bungie'},
-		errNoResponseFromBungie = {text:'no response from Bungie'},
-		errNoMatchesFound = {text:'no matches found'},
-		errNoCharactersFound = {text:'no characters found'},
-		errUnableToConnect = {text: 'unable to connect'},
 		hashes = {
 			3159615086: 'glimmer',
 			1415355184: 'crucible marks',
@@ -84,7 +79,7 @@ $(function() {
 				2659248068: {name: "Vault of Glass", level: 30}
 			}
 		},
-		mostRecentCharacterDate = null;
+		playerData = {};
 
 	function getUrlVars()
 	{
@@ -101,26 +96,20 @@ $(function() {
 
 	function performSearch() {
 		startLoading();
-		searchForMembership(textInput.val())
-		.done(function(res){
-			var member = {};
-			for(var i=0;i<res.length;i++) {
-				if(res[i].membershipType === selectedAccountType) {
-					member = res[i];
-					break;
-				}
-			}
-			getCharacterIds(member)
-			.done(function(res) {
-				for(var i=0;i<res.data.characters.length;i++) {
-					loadCharacterInfo(res.data.characters[i], i===res.data.characters.length-1);
-				}
-			})
-			.fail(function(err) {
-				stopLoading(err);
-			});
-		})
-		.fail(function(err){
+		$.ajax({
+			url: '/search', 
+			type: 'POST',
+			data: JSON.stringify({username:textInput.val(), membershipType:selectedAccountType}),
+			contentType:'application/json; charset=utf-8',
+			dataType:'json'
+		}).done(function(res){
+			console.log('success');
+			playerData = res;		
+			sortPlayerData();
+			displayPlayerData();
+			stopLoading(playerData.error);
+		}).fail(function(err){
+			console.log('failure');
 			stopLoading(err);
 		});
 	}
@@ -141,6 +130,72 @@ $(function() {
 		results.show();
 	}
 
+	function sortPlayerData() {
+		if(!playerData.characters || playerData.characters.length <= 1) {
+			return;
+		}
+		playerData.characters.sort(function(a,b) {
+			return new Date(b.dateLastPlayed) - new Date(a.dateLastPlayed);
+		});
+	}
+
+	function displayPlayerData() {
+		if(!playerData.characters || !playerData.characters.length) {
+			return;
+		}
+		for(var i=0; i<playerData.characters.length;i++) {
+			displayCharacterData(playerData.characters[i]);
+		}
+	}
+
+	function displayCharacterData(character) {
+		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
+			mostRecentDailyReset = getDateOfMostRecentDailyReset();
+		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
+		var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
+		
+		for(var i=0;i<character.inventory.currencies.length;i++) {
+			d.append(' ' + character.inventory.currencies[i].value + ' ' + hashes[character.inventory.currencies[i].itemHash]);
+			if(i<character.inventory.currencies.length-1) {
+				d.append(',');
+			}
+		}
+
+		var a = $('<div/>')
+				.addClass('character-activities')
+				.appendTo(d),
+			w = $('<div/>')
+				.addClass('character-weekly-marks')
+				.appendTo(d),
+			characterDate = new Date(character.dateLastPlayed),
+			playedSinceWeeklyReset = characterDate - mostRecentWeeklyReset > 0;
+			playedSinceDailyReset = characterDate - mostRecentDailyReset > 0;
+		
+		//show activities
+		if(playedSinceWeeklyReset) {
+			showActivityCompletion(a, character.activities);
+		} else {
+			showActivityCompletion(a);
+		}
+
+		//show progression
+		for(i=0;i<character.progressions.length;i++) {
+			character.progressions[i].characterDate = characterDate;
+			character.progressions[i].playedSinceWeeklyReset = playedSinceWeeklyReset;
+			character.progressions[i].playedSinceDailyReset = playedSinceDailyReset;
+			if(hashes[character.progressions[i].progressionHash]) {
+				d.append(buildProgressBar(character.progressions[i]));
+			} else if(hashes.weeklyMarks[character.progressions[i].progressionHash]) {
+				if(!playedSinceWeeklyReset) {
+					character.progressions[i].level = 0;
+				}
+				w.append(buildMarksBar(character.progressions[i]));
+			}
+		}
+
+		d.appendTo(characters);
+	}
+
 	function getDateOfMostRecentDailyReset() {
 		var date = new Date();
 		if(date.getUTCHours() < 9) {
@@ -151,66 +206,6 @@ $(function() {
 		date.setUTCSeconds(0);
 		date.setUTCMilliseconds(0);
 		return date;
-	}
-
-	function loadCharacterInfo(character, isLastCharacter) {
-		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
-			mostRecentDailyReset = getDateOfMostRecentDailyReset();
-		var profileHref = 'http://www.bungie.net/en/Legend/' + character.characterBase.membershipType + '/' + character.characterBase.membershipId + '/' + character.characterBase.characterId;
-		getCurrency(character.characterBase)
-		.done(function (res) {
-			var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.characterLevel + ' ' + hashes[character.characterBase.genderHash] + ' ' + hashes[character.characterBase.raceHash] + ' ' + hashes[character.characterBase.classHash] + '</a>');
-			for(var i=0;i<res.length;i++) {
-				d.append(' ' + res[i].value + ' ' + hashes[res[i].itemHash]);
-				if(i<res.length-1) {
-					d.append(',');
-				}
-			}
-			var a = $('<div/>')
-					.addClass('character-activities')
-					.appendTo(d),
-				w = $('<div/>')
-					.addClass('character-weekly-marks')
-					.appendTo(d),
-				characterDate = new Date(character.characterBase.dateLastPlayed),
-				playedSinceWeeklyReset = characterDate - mostRecentWeeklyReset > 0;
-				playedSinceDailyReset = characterDate - mostRecentDailyReset > 0;
-			if(playedSinceWeeklyReset) {
-				getActivities(character.characterBase)
-				.done(function (res) {
-					showActivityCompletion(a, res);
-				});
-			} else {
-				showActivityCompletion(a);
-			}
-			getProgress(character.characterBase)
-			.done(function (res) {
-				for(var i=0;i<res.length;i++) {
-					res[i].characterDate = characterDate;
-					res[i].playedSinceWeeklyReset = playedSinceWeeklyReset;
-					res[i].playedSinceDailyReset = playedSinceDailyReset;
-					if(hashes[res[i].progressionHash]) {
-						d.append(buildProgressBar(res[i]));
-					} else if(hashes.weeklyMarks[res[i].progressionHash]) {
-						if(!playedSinceWeeklyReset) {
-							res[i].level = 0;
-						}
-						w.append(buildMarksBar(res[i]));
-					}
-				}
-				if(!mostRecentCharacterDate || characterDate - mostRecentCharacterDate > 0) {
-					d.prependTo(characters);
-					mostRecentCharacterDate = characterDate;
-				} else {
-					d.appendTo(characters);
-				}
-			})
-			.always(function () {
-				if(isLastCharacter) {
-					stopLoading();
-				}
-			});
-		});
 	}
 
 	function getDateOfMostRecentWeeklyReset() {
