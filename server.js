@@ -217,11 +217,16 @@ function CharacterDetailsFetcher(characterUrl) {
 		requestJson({url:url}, handleInventoryResponse);
 	}
 
+	//TODO clean up inventory response handling
 	function handleInventoryResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body) && body.Response.data) {
-			self.result.inventory = {
-				currencies: body.Response.data.currencies
-			};
+		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.currencies) {
+			self.result.inventory = {currencies:{}};
+			var currencies = body.Response.data.currencies;
+			for(var i=0;i<currencies.length;i++) {
+				self.result.inventory.currencies[currencies[i].itemHash] = {
+					value: currencies[i].value
+				};
+			}
 		}
 		self.completion.inventory = true;
 		finishIfComplete();
@@ -233,14 +238,13 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function handleActivitiesResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body) && body.Response.data) {
-			self.result.activities = [];
+		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.available) {
+			self.result.activities = {};
 			var activities = body.Response.data.available;
 			for(var i=0; i < activities.length; i++) {
-				self.result.activities.push({
-					activityHash: activities[i].activityHash,
+				self.result.activities[activities[i].activityHash] = {
 					isCompleted: activities[i].isCompleted
-				});
+				};
 			}
 			self.result.activites = body.Response.data.available;
 		}
@@ -254,8 +258,19 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function handleProgressionResponse(error, response, body) {
-		if(bungieResponseIsValid(error, body) && body.Response.data) {
-			self.result.progressions = body.Response.data.progressions;
+		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.progressions) {
+			var progressions = body.Response.data.progressions;
+			self.result.progressions = {};
+			for(var i=0; i<progressions.length; i++) {
+				self.result.progressions[progressions[i].progressionHash] = {
+					dailyProgress: progressions[i].dailyProgress,
+                    weeklyProgress: progressions[i].weeklyProgress,
+                    currentProgress: progressions[i].currentProgress,
+                    level: progressions[i].level,
+                    progressToNextLevel: progressions[i].progressToNextLevel,
+                    nextLevelAt: progressions[i].nextLevelAt
+				};
+			}
 		}
 		self.completion.progressions = true;
 		finishIfComplete();
@@ -325,13 +340,17 @@ function DatabaseConnectionHandler() {
 	};
 
 	self.find = function(condition, options, callback) {
-		self.db.collection('players').find(condition, options, callback);
+		self.db.collection('players').find(condition, options).toArray(callback);
 	};
 }
 
 function leaderboard(req, res) {
-	var fetcher = new Fetcher();
-	res.json();
+	var currentProgressField = {};
+	var fetcher = new Fetcher({},{sort:{'characters.progressions.progressionHash.529303302':1}, fields:{'membership.displayName':1,'membership.id':1, 'character.id':1,'characters.progressions.529303302.progressionHash':1, 'characters.progressions.529303302.currentProgress':1}});
+	fetcher.fetch();
+	fetcher.finished(function(docs) {
+		res.json(docs);
+	});
 }
 
 function Fetcher(condition, options) {
@@ -339,20 +358,26 @@ function Fetcher(condition, options) {
 	self.condition = condition;
 	self.options = options;
 
-	self.fetch = function(callback) {
-		self.callback = callback;
+	self.fetch = function() {
 		try {
 			validate();
 			self.dbHandler = new DatabaseConnectionHandler();
 			self.dbHandler.connect(find);
 		} catch(err) {
 			console.log('Stasher Error',err);
+			self.result.error = 'unable to fetch from the database';
+			finish();
 		}
 	};
 
+	self.finished = function(finishedCallback) {
+		self.finishedCallback = finishedCallback;
+	};
+
 	function validate() {
+		var limit = 100;
 		self.options = self.options || {};
-		self.options.limit = Math.min(self.options.limit, 100);
+		self.options.limit = (self.options.limit && Math.min(self.options.limit, limit)) || limit;
 	}
 
 	function find() {
@@ -364,7 +389,15 @@ function Fetcher(condition, options) {
 			throw err;
 		}
 		self.dbHandler.disconnect();
-		self.callback(docs);
+		self.result = docs;
+		finish();
+	}
+
+	function finish() {
+		if(self.finishedCallback) {
+			self.finishedCallback(self.result);
+			self.finishedCallback = null;
+		}
 	}
 
 }
