@@ -107,7 +107,7 @@
 					leaderboard = res;
 					showLeaderboard();
 				}).fail(function(err){
-					container.text('something went wrong. but don\'t worry, this is just the early access version ;)');
+					container.text('something went wrong. but don\'t worry, this is just the early access version');
 				});
 			}
 
@@ -121,7 +121,7 @@
 						.append((i+1) + '. ')
 						.append('<a href="/#un=' + character.membership.displayName + '&t=' + character.membership.type + '">' + character.membership.displayName + '</a>')
 						.append(' (' + membershipTypes[character.membership.type] + ')')
-						.append(' ' + factions[selectedFaction] + ' Rank ' + character.progressions[selectedFaction].level)
+						.append(' ' + factions[selectedFaction] + ' Rank <b>' + character.progressions[selectedFaction].level + '</b>')
 						.append(' // ' + character.progressions[selectedFaction].currentProgress)
 						.appendTo(container);
 				});
