@@ -48,10 +48,10 @@
 	</div>
 
 	<div class="container description">
-	Hey there. This is an in-development preview of a new thing I'm working on for DestinyRep. I completely rewrote the server for this, so I'm pretty excited about it. It's got a long way to go, but check it out.
+	Hey there. This is an in-development preview of a new thing I'm working on for DestinyRep. I completely rewrote the server for this, so I'm pretty excited about it. It's got a long way to go, but check it out. Love it or hate it, we can talk about it <a href="http://www.reddit.com/r/DestinyTheGame/comments/2np7tz/destinyrep_leaderboards/">here on Reddit</a>.
 	</div>
 
-	<div class="container">
+	<div class="container clearfix">
 		<select class="leaderboard-select form-control">
 			
 		</select>
@@ -76,7 +76,8 @@
 			var selector = $('.leaderboard-select'),
 				leaderboard = {},
 				container = $('.results'),
-				selectedFaction = '';
+				selectedFaction = '',
+				skip = 0;
 
 			$.each(factions, function(hash, name) {
 				$('<option/>')

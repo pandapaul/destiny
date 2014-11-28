@@ -410,7 +410,7 @@ function Fetcher(condition, options) {
 	};
 
 	function validate() {
-		var limit = 100;
+		var limit = 1000;
 		self.options = self.options || {};
 		self.options.limit = (self.options.limit && Math.min(self.options.limit, limit)) || limit;
 	}
