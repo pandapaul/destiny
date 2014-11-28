@@ -51,8 +51,10 @@ function search(req, res) {
 	var searcher = new Searcher(req.body.username, req.body.membershipType);
 	searcher.search();
 	searcher.finished(function(searchResult) {
-		new Stasher(searchResult).stash();
 		res.json(searchResult);
+		if(!searchResult.error) {
+			new Stasher(searchResult).stash();
+		}
 	});
 }
 
@@ -163,7 +165,7 @@ function Searcher(username, membershipType) {
 			character.inventory = details.inventory;
 			character.activities = details.activities;
 			character.progressions = details.progressions;
-			self.characterDetailsCompletion[characterIndex] = true;
+			self.characterDetailsCompletion.push(true);
 			if(characterDetailsFetchingIsComplete()) {
 				finish();
 			}
@@ -271,36 +273,91 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 }
 
-console.log();
-
 function Stasher(data) {
 	var self = this;
 	self.data = data;
+
 	self.stash = function() {
 		try {
-			connect();
+			validate();
+			self.dbHandler = new DatabaseConnectionHandler();
+			self.dbHandler.connect(upsert);
 		} catch(err) {
-			console.log(err);
+			console.log('Stasher Error',err);
 		}
 	};
 
-	function connect() {
-		mongo.MongoClient.connect(process.env.MONGOLAB_URI || 'mongodb://heroku_app30494315:4r32lkr8kaqj5cgdk5lufohujt@ds051740.mongolab.com:51740/heroku_app30494315', function(err, db) {
-		  if(err) {
-		  	throw err;
-		  }
-		  self.db = db;
-		});
-	}
-
-	function disconnect() {
-		if(!self.db) {
-			throw 'Stasher: db not set. Connect first.';
+	function validate() {
+		if(!self.data || !self.data.membership || self.data.membership.id) {
+			throw new Error('data has no membership id');
 		}
-		self.db.close();
 	}
 
 	function upsert() {
-		
+		var condition = {'membership.id': self.data.membership.id};
+		self.dbHandler.upsert(condition, self.data, self.dbHandler.disconnect);
 	}
+}
+
+function DatabaseConnectionHandler() {
+	var self = this;
+
+	self.connect = function(callback) {
+		mongo.MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
+			if(err) {
+				throw err;
+			}
+			self.db = db;
+			callback();
+		});
+	};
+
+	self.disconnect = function() {
+		if(self.db && self.db.close) {
+			self.db.close();
+		}
+	};
+
+	self.upsert = function(condition, data, callback) {
+		self.db.collection('players').update(condition, data, {upsert:true}, callback);
+	};
+
+	self.find = function(condition, options, callback) {
+		self.db.collection('players').find(condition, options, callback);
+	};
+}
+
+function Fetcher(callback, condition, options) {
+	var self = this;
+	self.condition = condition;
+	self.options = options;
+	self.callback = callback;
+
+	self.fetch = function() {
+		try {
+			validate();
+			self.dbHandler = new DatabaseConnectionHandler();
+			self.dbHandler.connect(find);
+		} catch(err) {
+			console.log('Stasher Error',err);
+		}
+	};
+
+	function validate() {
+		self.options = self.options || {};
+		self.options.limit = Math.min(self.options.limit, 100);
+	}
+
+	function find() {
+		self.dbHandler.find(self.condition, self.options, handleResult);
+	}
+
+	function handleResult(err, docs) {
+		if(err) {
+			throw err;
+		}
+		self.dbHandler.disconnect();
+		self.callback(docs);
+	}
+
 }
