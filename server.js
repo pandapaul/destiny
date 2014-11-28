@@ -365,8 +365,22 @@ function DatabaseConnectionHandler() {
 }
 
 function leaderboard(req, res) {
-	var currentProgressField = {};
-	var fetcher = new Fetcher({},{sort:{'progressions.529303302.currentProgress':-1}, fields:{'_id':0, 'membership':1, 'id':1, 'progressions.529303302.currentProgress':1, 'progressions.529303302.level':1}});
+	var faction = req.body.faction || 529303302,
+		currentProgress = 'progressions.' + faction + '.currentProgress',
+		level = 'progressions.' + faction + '.level';
+
+	var sort = {};
+	sort[currentProgress] = -1;
+
+	var fields = {
+		'_id':0,
+		'membership':1,
+		'id':1
+	};
+	fields[currentProgress] = 1;
+	fields[level] = 1;
+
+	var fetcher = new Fetcher({},{sort:sort, fields:fields});
 	// var fetcher = new Fetcher();
 	fetcher.fetch();
 	fetcher.finished(function(docs) {

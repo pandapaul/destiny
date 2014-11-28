@@ -51,29 +51,61 @@
 	Hey there. This is an in-development preview of a new thing I'm working on for DestinyRep. I completely rewrote the server for this, so I'm pretty excited about it. It's got a long way to go, but check it out.
 	</div>
 
+	<div class="container">
+		<select class="leaderboard-select form-control">
+			
+		</select>
+	</div>
+
 	<div class="container results">
 		
 	</div>
 
 	<script>
 		$(function() {
-			var leaderboard = {};
 
-			var container = $('.results');
-			container.text('loading...');
+			var factions = {
+				529303302: 'Cryptarch',
+				3233510749: 'Vanguard',
+				1357277120: 'Crucible',
+				3871980777: 'New Monarchy',
+				2778795080: 'Dead Orbit',
+				1424722124: 'Future War Cult'
+			};
 
-			$.ajax({
-				url: '/leaderboard', 
-				type: 'POST',
-				contentType:'application/json; charset=utf-8',
-				dataType:'json'
-			}).done(function(res){
-				container.text('');
-				leaderboard = res;
-				showLeaderboard();
-			}).fail(function(err){
-				container.text('something went wrong. but do not worry, this is pre-pre-alpha');
+			var selector = $('.leaderboard-select'),
+				leaderboard = {},
+				container = $('.results'),
+				selectedFaction = '';
+
+			$.each(factions, function(hash, name) {
+				$('<option/>')
+					.val(hash)
+					.text(name)
+					.appendTo(selector);
 			});
+
+			selector.find('option:contains("Cryptarch")').prop('selected', true);
+			selector.on('change', getLeaderboard);
+			selector.change();
+
+			function getLeaderboard() {
+				container.text('loading...');
+				selectedFaction = selector.val();
+				$.ajax({
+					url: '/leaderboard', 
+					type: 'POST',
+					data: JSON.stringify({faction: selectedFaction}),
+					contentType:'application/json; charset=utf-8',
+					dataType:'json'
+				}).done(function(res){
+					container.text('');
+					leaderboard = res;
+					showLeaderboard();
+				}).fail(function(err){
+					container.text('something went wrong. but don\'t worry, this is just the early access version ;)');
+				});
+			}
 
 			function showLeaderboard() {
 				var membershipTypes = {
@@ -85,8 +117,8 @@
 						.append((i+1) + '. ')
 						.append('<a href="/#un=' + character.membership.displayName + '&t=' + character.membership.type + '">' + character.membership.displayName + '</a>')
 						.append(' (' + membershipTypes[character.membership.type] + ')')
-						.append(' Cryptarch Rank ' + character.progressions[529303302].level)
-						.append(' // ' + character.progressions[529303302].currentProgress)
+						.append(' ' + factions[selectedFaction] + ' Rank ' + character.progressions[selectedFaction].level)
+						.append(' // ' + character.progressions[selectedFaction].currentProgress)
 						.appendTo(container);
 				});
 			}
