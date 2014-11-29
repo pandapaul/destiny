@@ -399,7 +399,7 @@ function Fetcher(condition, options) {
 			self.dbHandler = new DatabaseConnectionHandler();
 			self.dbHandler.connect(find);
 		} catch(err) {
-			console.log('Stasher Error',err);
+			console.log('Fetcher Error',err);
 			self.result.error = 'unable to fetch from the database';
 			finish();
 		}
