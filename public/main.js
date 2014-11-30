@@ -103,13 +103,11 @@ $(function() {
 			contentType:'application/json; charset=utf-8',
 			dataType:'json'
 		}).done(function(res){
-			console.log('success');
 			playerData = res;		
 			sortPlayerData();
 			displayPlayerData();
 			stopLoading(playerData.error);
 		}).fail(function(err){
-			console.log('failure');
 			stopLoading(err);
 		});
 	}

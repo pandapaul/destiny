@@ -246,7 +246,6 @@ function CharacterDetailsFetcher(characterUrl) {
 					isCompleted: activities[i].isCompleted
 				};
 			}
-			self.result.activites = body.Response.data.available;
 		}
 		self.completion.activities = true;
 		finishIfComplete();
