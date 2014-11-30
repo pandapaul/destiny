@@ -382,6 +382,7 @@ function Fetcher(condition, options) {
 	var self = this;
 	self.condition = condition;
 	self.options = options;
+	self.result = {};
 
 	self.fetch = function() {
 		try {
