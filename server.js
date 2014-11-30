@@ -18,7 +18,6 @@ function initializeBungieStuff() {
 }
 
 function setupRoutesAndMiddleware() {
-	app.get('/', redirectIfNeeded);
 	app.use(express.static('public'));
 	app.use(bodyParser.json());
 	app.post('/search', search);
@@ -29,14 +28,6 @@ function listen() {
 	var listenPort = process.env.PORT || 5000;
 	app.listen(listenPort);
 	console.log('Listening on port ' + listenPort);
-}
-
-function redirectIfNeeded(req, res, next) {
-	if(req.header('host').indexOf('herokuapp.com') > -1) {
-		res.redirect(301, 'http://www.destinyrep.com');
-	} else {
-		next();
-	}
 }
 
 function search(req, res) {
