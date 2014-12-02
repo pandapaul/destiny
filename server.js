@@ -58,14 +58,19 @@ function search(req, res) {
 		return;
 	}
 
-	var searcher = new Searcher(req.body.username, req.body.membershipType);
-	searcher.search();
-	searcher.finished(function(searchResult) {
-		res.json(searchResult);
-		if(!searchResult.error) {
-			new Stasher(searchResult).stash();
-		}
-	});
+	try {
+		var searcher = new Searcher(req.body.username, req.body.membershipType);
+		searcher.search();
+		searcher.finished(function(searchResult) {
+			res.json(searchResult);
+			if(!searchResult.error) {
+				new Stasher(searchResult).stash();
+			}
+		});
+	} catch(err) {
+		console.log('search error', err);
+		res.json({error:'search error. try again in a moment'});
+	}
 }
 
 function Searcher(username, membershipType) {
@@ -449,4 +454,3 @@ function Fetcher(condition, options) {
 		}
 	}
 }
-
