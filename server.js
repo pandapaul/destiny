@@ -15,6 +15,11 @@ function initializeBungieStuff() {
 		2: 'TigerPSN'
 	};
 	bungieStuff.url = 'http://www.bungie.net/Platform/Destiny/';
+	bungieStuff.activityTypeNightfall = 575572995;
+	bungieStuff.activityTypes = {
+		575572995: 'Nightfall/WeeklyHeroic',
+		2043403989: 'Raid'
+	};
 }
 
 function setupRoutesAndMiddleware() {
@@ -224,18 +229,21 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function getActivities() {
-		var url = self.characterUrl + 'Activities/';
+		var url = self.characterUrl + 'Activities/?definitions=true';
 		requestJson({url:url}, handleActivitiesResponse);
 	}
 
 	function handleActivitiesResponse(error, response, body) {
 		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.available) {
 			self.result.activities = {};
-			var activities = body.Response.data.available;
+			var activities = body.Response.data.available,
+				definitions = body.Response.definitions;
 			for(var i=0; i < activities.length; i++) {
-				self.result.activities[activities[i].activityHash] = {
-					isCompleted: activities[i].isCompleted
-				};
+				if(bungieStuff.activityTypes[definitions.activities[activities[i].activityHash].activityTypeHash]) {
+					self.result.activities[activities[i].activityHash] = {
+						isCompleted: activities[i].isCompleted
+					};
+				}
 			}
 		}
 		self.completion.activities = true;
