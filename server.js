@@ -20,6 +20,19 @@ function initializeBungieStuff() {
 		575572995: 'Nightfall/WeeklyHeroic',
 		2043403989: 'Raid'
 	};
+	bungieStuff.progressions = {
+		3871980777: 'New Monarchy',
+		529303302: 'Cryptarch',
+		2161005788: 'Iron Banner',
+		452808717: 'Queen',
+		3233510749: 'Vanguard',
+		1357277120: 'Crucible',
+		2778795080: 'Dead Orbit',
+		1424722124: 'Future War Cult',
+		174528503: 'Eris Morn',
+		2033897742: 'Weekly Vanguard Marks',
+		2033897755: 'Weekly Crucible Marks'
+	};
 }
 
 function setupRoutesAndMiddleware() {
@@ -260,14 +273,16 @@ function CharacterDetailsFetcher(characterUrl) {
 			var progressions = body.Response.data.progressions;
 			self.result.progressions = {};
 			for(var i=0; i<progressions.length; i++) {
-				self.result.progressions[progressions[i].progressionHash] = {
-					dailyProgress: progressions[i].dailyProgress,
-                    weeklyProgress: progressions[i].weeklyProgress,
-                    currentProgress: progressions[i].currentProgress,
-                    level: progressions[i].level,
-                    progressToNextLevel: progressions[i].progressToNextLevel,
-                    nextLevelAt: progressions[i].nextLevelAt
-				};
+				if(bungieStuff.progressions[progressions[i].progressionHash]) {
+					self.result.progressions[progressions[i].progressionHash] = {
+						dailyProgress: progressions[i].dailyProgress,
+	                    weeklyProgress: progressions[i].weeklyProgress,
+	                    currentProgress: progressions[i].currentProgress,
+	                    level: progressions[i].level,
+	                    progressToNextLevel: progressions[i].progressToNextLevel,
+	                    nextLevelAt: progressions[i].nextLevelAt
+					};
+				}
 			}
 		}
 		self.completion.progressions = true;
@@ -433,5 +448,4 @@ function Fetcher(condition, options) {
 			self.finishedCallback = null;
 		}
 	}
-
 }
