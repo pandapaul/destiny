@@ -187,7 +187,6 @@ function Searcher(username, membershipType) {
 	}
 
 	function finish() {
-		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
@@ -296,6 +295,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function finish() {
+		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
