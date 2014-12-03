@@ -483,4 +483,4 @@ function countCharactersByAccount(req, res) {
 		fetcher.finished(callback);
 }
 
-app.post('/countCharactersByAccount', countCharactersByAccount);
+app.get('/countCharactersByAccount', countCharactersByAccount);
