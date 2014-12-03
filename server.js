@@ -399,7 +399,6 @@ function leaderboard(req, res) {
 	fields[level] = 1;
 
 	var fetcher = new Fetcher({},{sort:sort, fields:fields});
-	// var fetcher = new Fetcher();
 	fetcher.fetch();
 	fetcher.finished(function(docs) {
 		res.json(docs);
@@ -442,15 +441,46 @@ function Fetcher(condition, options) {
 		if(err) {
 			throw err;
 		}
-		self.dbHandler.disconnect();
 		self.result = docs;
 		finish();
 	}
 
 	function finish() {
+		if(self.dbHandler) {
+			self.dbHandler.disconnect();
+		}
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
 		}
 	}
 }
+
+function countCharactersByAccount(req, res) {
+	var collection = 'characters',
+		condition = {},
+		options = {
+			fields: {
+				'_id':0,
+				'membership.displayName':1,
+				'membership.type':1
+			},
+			sort: {
+				'membership.displayName':1
+			},
+			limit:1000
+		},
+		callback = function(docs) {
+			console.log('got some docs');
+			for(var i=0; i<docs.length; i++) {
+				var count = result[docs[i].membership.type][docs[i].membership.displayName];
+				count = count? count+1:1;
+			}
+			res.json(result);
+		},
+		fetcher = new Fetcher({},options);
+		fetcher.fetch();
+		fetcher.finished(callback);
+}
+
+app.post('/countCharactersByAccount', countCharactersByAccount);
