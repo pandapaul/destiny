@@ -455,32 +455,3 @@ function Fetcher(condition, options) {
 		}
 	}
 }
-
-function countCharactersByAccount(req, res) {
-	var collection = 'characters',
-		condition = {},
-		options = {
-			fields: {
-				'_id':0,
-				'membership.displayName':1,
-				'membership.type':1
-			},
-			sort: {
-				'membership.displayName':1
-			},
-			limit:1000
-		},
-		callback = function(docs) {
-			console.log('got some docs');
-			for(var i=0; i<docs.length; i++) {
-				var count = result[docs[i].membership.type][docs[i].membership.displayName];
-				count = count? count+1:1;
-			}
-			res.json(result);
-		},
-		fetcher = new Fetcher({},options);
-		fetcher.fetch();
-		fetcher.finished(callback);
-}
-
-app.get('/countCharactersByAccount', countCharactersByAccount);
