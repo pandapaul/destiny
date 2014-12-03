@@ -449,7 +449,8 @@ $(function() {
 	var headerHeight = parseInt($('.header').css('height')),
 		coolStuffDiv = $('.cool-stuff'),
 		aboutDiv = $('.about'),
-		contactDiv = $('.contact');
+		contactDiv = $('.contact'),
+		contributingDiv = $('.contributing');
 
 	function scrollToDiv(div) {
 		var pos = div.offset();
@@ -471,6 +472,10 @@ $(function() {
 
 	$('.contact-link').on('click', function() {
 		scrollToDiv(contactDiv);
+	});
+
+	$('.contributing-link').on('click', function() {
+		scrollToDiv(contributingDiv);
 	});
 
 });
