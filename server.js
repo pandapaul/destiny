@@ -300,7 +300,6 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function finish() {
-		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
@@ -328,7 +327,11 @@ function Stasher(data) {
 		}
 	}
 
-	function upsert() {
+	function upsert(connectionError) {
+		if(connectionError) {
+			finish();
+			return;
+		}
 		for(var i=0; i<self.data.characters.length; i++) {
 			upsertCharacter(self.data.characters[i]);
 		}
@@ -336,6 +339,7 @@ function Stasher(data) {
 
 	function upsertCharacter(character) {
 		character.membership = self.data.membership;
+		character.updated = new Date();
 		var condition = {
 			'id': character.id,
 			'membership.id': character.membership.id
@@ -349,8 +353,12 @@ function Stasher(data) {
 		}
 		self.upsertProgress++;
 		if(self.upsertProgress >= self.data.characters.length) {
-			self.dbHandler.disconnect();
+			finish();
 		}
+	}
+
+	function finish() {
+		self.dbHandler.disconnect();
 	}
 }
 
@@ -359,11 +367,11 @@ function DatabaseConnectionHandler() {
 
 	self.connect = function(callback) {
 		mongo.MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
-			if(err) {
-				throw err;
-			}
 			self.db = db;
-			callback();
+			if(err) {
+				console.log(err);
+			}
+			callback(err);
 		});
 	};
 
@@ -433,7 +441,11 @@ function Fetcher(condition, options) {
 		self.options.limit = (self.options.limit && Math.min(self.options.limit, limit)) || limit;
 	}
 
-	function find() {
+	function find(connectionError) {
+		if(connectionError) {
+			finish();
+			return;
+		}
 		self.dbHandler.find('characters',self.condition, self.options, handleResult);
 	}
 
