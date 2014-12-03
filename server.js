@@ -15,6 +15,24 @@ function initializeBungieStuff() {
 		2: 'TigerPSN'
 	};
 	bungieStuff.url = 'http://www.bungie.net/Platform/Destiny/';
+	bungieStuff.activityTypeNightfall = 575572995;
+	bungieStuff.activityTypes = {
+		575572995: 'Nightfall/WeeklyHeroic',
+		2043403989: 'Raid'
+	};
+	bungieStuff.progressions = {
+		3871980777: 'New Monarchy',
+		529303302: 'Cryptarch',
+		2161005788: 'Iron Banner',
+		452808717: 'Queen',
+		3233510749: 'Vanguard',
+		1357277120: 'Crucible',
+		2778795080: 'Dead Orbit',
+		1424722124: 'Future War Cult',
+		174528503: 'Eris Morn',
+		2033897742: 'Weekly Vanguard Marks',
+		2033897755: 'Weekly Crucible Marks'
+	};
 }
 
 function setupRoutesAndMiddleware() {
@@ -40,14 +58,19 @@ function search(req, res) {
 		return;
 	}
 
-	var searcher = new Searcher(req.body.username, req.body.membershipType);
-	searcher.search();
-	searcher.finished(function(searchResult) {
-		res.json(searchResult);
-		if(!searchResult.error) {
-			new Stasher(searchResult).stash();
-		}
-	});
+	try {
+		var searcher = new Searcher(req.body.username, req.body.membershipType);
+		searcher.search();
+		searcher.finished(function(searchResult) {
+			res.json(searchResult);
+			if(!searchResult.error) {
+				new Stasher(searchResult).stash();
+			}
+		});
+	} catch(err) {
+		console.log('search error', err);
+		res.json({error:'search error. try again in a moment'});
+	}
 }
 
 function Searcher(username, membershipType) {
@@ -169,7 +192,6 @@ function Searcher(username, membershipType) {
 	}
 
 	function finish() {
-		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
@@ -224,7 +246,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function getActivities() {
-		var url = self.characterUrl + 'Activities/';
+		var url = self.characterUrl + 'Activities/?definitions=true';
 		requestJson({url:url}, handleActivitiesResponse);
 	}
 
@@ -232,11 +254,14 @@ function CharacterDetailsFetcher(characterUrl) {
 	function handleActivitiesResponse(error, response, body) {
 		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.available) {
 			self.result.activities = {};
-			var activities = body.Response.data.available;
+			var activities = body.Response.data.available,
+				definitions = body.Response.definitions;
 			for(var i=0; i < activities.length; i++) {
-				self.result.activities[activities[i].activityHash] = {
-					isCompleted: activities[i].isCompleted
-				};
+				if(bungieStuff.activityTypes[definitions.activities[activities[i].activityHash].activityTypeHash]) {
+					self.result.activities[activities[i].activityHash] = {
+						isCompleted: activities[i].isCompleted
+					};
+				}
 			}
 		}
 		self.completion.activities = true;
@@ -254,14 +279,16 @@ function CharacterDetailsFetcher(characterUrl) {
 			var progressions = body.Response.data.progressions;
 			self.result.progressions = {};
 			for(var i=0; i<progressions.length; i++) {
-				self.result.progressions[progressions[i].progressionHash] = {
-					dailyProgress: progressions[i].dailyProgress,
-                    weeklyProgress: progressions[i].weeklyProgress,
-                    currentProgress: progressions[i].currentProgress,
-                    level: progressions[i].level,
-                    progressToNextLevel: progressions[i].progressToNextLevel,
-                    nextLevelAt: progressions[i].nextLevelAt
-				};
+				if(bungieStuff.progressions[progressions[i].progressionHash]) {
+					self.result.progressions[progressions[i].progressionHash] = {
+						dailyProgress: progressions[i].dailyProgress,
+	                    weeklyProgress: progressions[i].weeklyProgress,
+	                    currentProgress: progressions[i].currentProgress,
+	                    level: progressions[i].level,
+	                    progressToNextLevel: progressions[i].progressToNextLevel,
+	                    nextLevelAt: progressions[i].nextLevelAt
+					};
+				}
 			}
 		}
 		self.completion.progressions = true;
@@ -275,6 +302,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function finish() {
+		self.result.dateLastUpdated = new Date();
 		if(self.finishedCallback) {
 			self.finishedCallback(self.result);
 			self.finishedCallback = null;
@@ -427,5 +455,4 @@ function Fetcher(condition, options) {
 			self.finishedCallback = null;
 		}
 	}
-
 }
