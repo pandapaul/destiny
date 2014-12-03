@@ -228,6 +228,7 @@ function CharacterDetailsFetcher(characterUrl) {
 		requestJson({url:url}, handleActivitiesResponse);
 	}
 
+	//TODO clean up activities response handling
 	function handleActivitiesResponse(error, response, body) {
 		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.available) {
 			self.result.activities = {};
@@ -247,6 +248,7 @@ function CharacterDetailsFetcher(characterUrl) {
 		requestJson({url:url}, handleProgressionResponse);
 	}
 
+	//TODO clean up progression response handling
 	function handleProgressionResponse(error, response, body) {
 		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.progressions) {
 			var progressions = body.Response.data.progressions;
