@@ -72,53 +72,90 @@ a {
 }
 .results .character-container {
 	margin-top:30px;
+	max-width: 500px;
 }
 .results .character-link {
 	font-weight:bold;
 	color: rgb(206, 174, 50);
 	margin-right:10px;
 }
-.progress-description {
-	padding: 1px;
-}
-.progress {
-	background-color: rgb(60,60,60);
-	margin-bottom: 3px;
-}
-.progress-bar {
-	background-color: rgb(93,164,105);
-	color: #222;
-	font-size: 14px;
-	padding-left: 5px;
-}
-.progress-details {
-	font-size: 14px;
-	text-align: left;
-	padding-left: 10px;
-}
 .progress-container {
-	font-size: 16px;
-	margin-top:10px;
-	max-width: 300px;
-	margin-left:auto;
-	margin-right:auto;
-	cursor: pointer;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
-	border-top-right-radius: 7px;
-	border-bottom-right-radius: 7px;
-	border-top-left-radius: 7px;
-	border-bottom-left-radius: 7px;
-	padding: 3px;
-	border: 1px solid rgba(0,0,0,0);
+	display: inline-block;
+    font-size:0.8em;
+    width: 8.5em;
+    height: 8.5em;
+    background-color: rgb(65,65,65);
+    border: 1px solid rgb(0,0,0);
+    position: relative;
 }
-.progress-container-selected {
-	border: 1px solid rgb(78, 50, 99);
-	/*background-color: rgb(206, 174, 50);*/
-	background-color: rgba(78, 50, 99, 0.2);
+.progress-container .progress-bar {
+    position: absolute;
+    z-index:0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(93,164,105,0.5);
+}
+.progress-container .icon {
+    position: absolute;
+    z-index:1;
+    margin: 17.5%;
+    width:65%;
+    height:65%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.progress-container .title {
+    position: absolute;
+    z-index:1;
+    width:100%;
+    height:1.2em;
+    text-align:center;
+    background-color: rgba(0,0,0,0.3);
+}
+.progress-container .amount {
+    position: absolute;
+    z-index:1;
+    width: 100%;
+    height:1.2em;
+    text-align: center;
+    bottom: 0;
+}
+.glimmer .icon {
+	background-image: url("/icons/glimmer.png");
+}
+.vanguard-marks .icon {
+	background-image: url("/icons/vanguardmark.png");
+}
+.crucible-marks .icon {
+	background-image: url("/icons/cruciblemark.png");
+}
+.crucible .icon {
+    background-image: url("/icons/crucible.png");
+}
+.future-war-cult .icon {
+    background-image: url("/icons/futurewarcult.png");
+}
+.eris-morn .icon {
+    background-image: url("/icons/erismorn.png");
+}
+.queen .icon {
+    background-image: url("/icons/queen.png");
+}
+.cryptarch .icon {
+    background-image: url("/icons/cryptarch.png");
+}
+.iron-banner .icon {
+    background-image: url("/icons/ironbanner.png");
+}
+.dead-orbit .icon {
+    background-image: url("/icons/deadorbit.png");
+}
+.vanguard .icon {
+    background-image: url("/icons/vanguard.png");
+}
+.new-monarchy .icon {
+    background-image: url("/icons/newmonarchy.png");
 }
 .google-play-link {
 	margin-top:-2px;

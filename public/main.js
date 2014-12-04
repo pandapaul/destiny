@@ -27,8 +27,8 @@ $(function() {
 			1424722124: 'Future War Cult',
 			174528503: 'Eris Morn',
 			weeklyMarks: {
-				2033897742: 'Weekly Vanguard Marks',
-				2033897755: 'Weekly Crucible Marks'
+				2033897742: 'Vanguard Marks',
+				2033897755: 'Crucible Marks'
 			},
 			weeklyHeroics: {
 				2591274210: {name: "The Devil's Lair", level: 22},
@@ -151,7 +151,7 @@ $(function() {
 		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
 			mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
-		var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
+		var d = $('<div class="container character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
 		
 		//currencies  TODO cleanup
 		var currencyCount = 0;
@@ -189,12 +189,12 @@ $(function() {
 			progression.playedSinceDailyReset = playedSinceDailyReset;
 			progression.progressionHash = hash;
 			if(hashes[hash]) {
-				d.append(buildProgressBar(progression));
+				d.append(buildFactionBar(progression));
 			} else if(hashes.weeklyMarks[hash]) {
 				if(!playedSinceWeeklyReset) {
 					progression.level = 0;
 				}
-				w.append(buildMarksBar(progression));
+				w.append(buildWeeklyMarksBar(progression));
 			}
 		});
 
@@ -317,101 +317,47 @@ $(function() {
 		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
 	}
 
-	function buildProgressBar(progressionData) {
-		var adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
-			adjustedWeeklyLabel = 'That Week';
-		if(progressionData.playedSinceWeeklyReset) {
-			adjustedLevel = progressionData.level;
-			adjustedWeeklyLabel = 'This Week';
-		}
-		if(progressionData.playedSinceDailyReset) {
-			adjustedDailyLabel = 'Today';
-		}
-		var container = $('<div/>')
-				.addClass('progress-container'),
-			description = $('<div/>')
-				.addClass('progress-description clearfix'),
-			faction = $('<div/>')
-				.addClass('pull-left')
-				.text(hashes[progressionData.progressionHash]),
-			rank = $('<div/>')
-				.addClass('pull-right')
-				 .text('Rank ' + progressionData.level),
-			progress = $('<div/>')
-				.addClass('progress'),
-			progressbar = $('<div/>')
-				.addClass('progress-bar')
-				.attr('role','progressbar')
-				.attr('aria-valuenow',progressionData.progressToNextLevel)
-				.attr('aria-valuemax',progressionData.nextLevelAt)
-				.attr('aria-valuemin','0')
-				.width(progressionData.progressToNextLevel/progressionData.nextLevelAt*100 + '%')
-				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt),
-			progressDetails = $('<div/>')
-				.addClass('progress-details')
-				.css('display','none'),
-			progressToday = $('<div/>')
-				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
-				.appendTo(progressDetails),
-			progressThisWeek = $('<div/>')
-				.text(adjustedWeeklyLabel + ': ' + progressionData.weeklyProgress)
-				.appendTo(progressDetails),
-			progressLifetime = $('<div/>')
-				.text('Lifetime: ' + progressionData.currentProgress)
-				.appendTo(progressDetails);
-		container.on('click', function() {
-			progressDetails.toggle();
-			container.toggleClass('progress-container-selected');
-		});
-		progress.append(progressbar);
-		description.append(faction, rank);
-		return container.append(description, progress, progressDetails);
+	function buildFactionBar(progressionData) {
+		var progress = {
+			type: hashes[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
+			title: 'Rank ' + progressionData.level,
+			current: progressionData.progressToNextLevel,
+			max: progressionData.nextLevelAt
+		};
+		return buildProgressBar(progress);
 	}
 
-	function buildMarksBar(progressionData) {
-		var adjustedLevel = 0,
-			adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
-			adjustedWeeklyLabel = 'Week Before';
-		if(progressionData.playedSinceWeeklyReset) {
-			adjustedLevel = progressionData.level;
-			adjustedWeeklyLabel = 'Last Week';
-		}
-		if(progressionData.playedSinceDailyReset) {
-			adjustedDailyLabel = 'Today';
-		}
+	function buildProgressBar(progress) {
 		var container = $('<div/>')
-				.addClass('progress-container'),
-			description = $('<div/>')
-				.addClass('progress-description clearfix'),
-			title = $('<div/>')
-				.addClass('pull-left')
-				.text(hashes.weeklyMarks[progressionData.progressionHash]),
-			progress = $('<div/>')
-				.addClass('progress'),
+				.addClass('progress-container')
+				.addClass(progress.type),
+			icon = $('<div/>')
+				.addClass('icon'),
 			progressbar = $('<div/>')
 				.addClass('progress-bar')
-				.attr('role','progressbar')
-				.attr('aria-valuenow',adjustedLevel)
-				.attr('aria-valuemax',100)
-				.attr('aria-valuemin','0')
-				.width(adjustedLevel + '%')
-				.text(adjustedLevel + '/100'),
-			progressDetails = $('<div/>')
-				.addClass('progress-details')
-				.css('display','none'),
-			progressToday = $('<div/>')
-				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
-				.appendTo(progressDetails),
-			progressLastWeek = $('<div/>')
-				.text(adjustedWeeklyLabel + ': ' + Math.abs(adjustedLevel - progressionData.weeklyProgress))
-				.appendTo(progressDetails);
-		container.on('click', function() {
-			progressDetails.toggle();
-			container.toggleClass('progress-container-selected');
-		});
-		progress.append(progressbar);
-		description.append(title);
-		return container.append(description, progress, progressDetails);
+				.height(progress.current/progress.max*100 + '%'),
+			amount = $('<div/>')
+				.addClass('amount')
+				.text(progress.current + '/' + progress.max),
+			title = $('<div/>')
+				.addClass('title')
+				.text(progress.title);
+
+		return container.append(title, icon, progressbar, amount);
+	}
+
+	function buildWeeklyMarksBar(progressionData) {
+		var adjustedLevel = 0;
+		if(progressionData.playedSinceWeeklyReset) {
+			adjustedLevel = progressionData.level;
+		}
+		var progress = {
+			type: hashes.weeklyMarks[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
+			title: 'Weekly',
+			current: adjustedLevel,
+			max: 100
+		};
+		return buildProgressBar(progress);
 	}
 
 	function updateFormFromHash() {
