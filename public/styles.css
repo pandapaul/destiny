@@ -67,6 +67,26 @@ a {
 	text-align: center;
 	margin-top:10px;
 }
+.results .nav li {
+	width: 33%;
+}
+li.active a {
+	background-color: rgb(78, 50, 99) !important;
+}
+li.active a:hover {
+	background-color: rgb(78, 50, 99) !important;
+}
+li a:hover {
+	color: rgb(222, 222, 222);
+	background-color: rgba(78, 50, 99, 0.7) !important;
+}
+li a {
+	color: rgb(222, 222, 222);
+	background-color: rgba(78, 50, 99, 0.3) !important;
+}
+.results {
+	display: none;
+}
 .results .characters {
 	margin-top:10px;
 }
@@ -81,7 +101,7 @@ a {
 }
 .progress-container {
 	display: inline-block;
-    font-size:0.8em;
+    font-size:0.85em;
     width: 8.5em;
     height: 8.5em;
     background-color: rgb(65,65,65);

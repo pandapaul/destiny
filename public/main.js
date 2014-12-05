@@ -2,7 +2,8 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		results = $('.results'),
-		characters = $('.characters'),
+		characters = results.find('.characters'),
+		tabs = results.find('.tab'),
 		message = $('.message'),
 		selectedAccountType = 2,
 		hashes = {
@@ -388,40 +389,51 @@ $(function() {
 		}
 	});
 
-	textInput.focus();
-
-	updateFormFromHash();
-
-	var headerHeight = parseInt($('.header').css('height')),
-		coolStuffDiv = $('.cool-stuff'),
-		aboutDiv = $('.about'),
-		contactDiv = $('.contact'),
-		contributingDiv = $('.contributing');
-
 	function scrollToDiv(div) {
 		var pos = div.offset();
 		pos.top -= headerHeight;
 		scrollTo(pos.left, pos.top);
 	}
 
-	$('.search-link').on('click', function() {
-		scrollTo(0,0);
-	});
+	function setupNavigation() {
+		var headerHeight = parseInt($('.header').css('height')),
+		coolStuffDiv = $('.cool-stuff'),
+		aboutDiv = $('.about'),
+		contactDiv = $('.contact'),
+		contributingDiv = $('.contributing'),
+		navpills = $('.nav-pills li');
 
-	$('.cool-stuff-link').on('click', function() {
-		scrollToDiv(coolStuffDiv);
-	});
+		$('.search-link').on('click', function() {
+			scrollTo(0,0);
+		});
 
-	$('.about-link').on('click', function() {
-		scrollToDiv(aboutDiv);
-	});
+		$('.cool-stuff-link').on('click', function() {
+			scrollToDiv(coolStuffDiv);
+		});
 
-	$('.contact-link').on('click', function() {
-		scrollToDiv(contactDiv);
-	});
+		$('.about-link').on('click', function() {
+			scrollToDiv(aboutDiv);
+		});
 
-	$('.contributing-link').on('click', function() {
-		scrollToDiv(contributingDiv);
-	});
+		$('.contact-link').on('click', function() {
+			scrollToDiv(contactDiv);
+		});
+
+		$('.contributing-link').on('click', function() {
+			scrollToDiv(contributingDiv);
+		});
+
+		navpills.on('click', function() {
+			var self = $(this);
+			navpills.removeClass('active');
+			self.addClass('active');
+			tabs.hide();
+			results.find('.' + self.text().toLowerCase()).show();
+		});
+	}
+
+	textInput.focus();
+	setupNavigation();
+	updateFormFromHash();
 
 });
