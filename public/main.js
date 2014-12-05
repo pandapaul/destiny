@@ -3,7 +3,7 @@ $(function() {
 		textInput = $('#textInput'),
 		results = $('.results'),
 		characters = results.find('.characters'),
-		tabs = results.find('.tab'),
+		tabs = results.find('.tabs'),
 		message = $('.message'),
 		selectedAccountType = 2,
 		hashes = {
@@ -149,6 +149,7 @@ $(function() {
 
 	//TODO gyahhhh cleanup
 	function displayCharacterData(character) {
+		tabs.find('.current').show();
 		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
 			mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
@@ -320,6 +321,7 @@ $(function() {
 
 	function buildFactionBar(progressionData) {
 		var progress = {
+			label: hashes[progressionData.progressionHash],
 			type: hashes[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
 			title: 'Rank ' + progressionData.level,
 			current: progressionData.progressToNextLevel,
@@ -333,7 +335,8 @@ $(function() {
 				.addClass('progress-container')
 				.addClass(progress.type),
 			icon = $('<div/>')
-				.addClass('icon'),
+				.addClass('icon')
+				.prop('alt',progress.label),
 			progressbar = $('<div/>')
 				.addClass('progress-bar')
 				.height(progress.current/progress.max*100 + '%'),
@@ -353,6 +356,7 @@ $(function() {
 			adjustedLevel = progressionData.level;
 		}
 		var progress = {
+			label: hashes.weeklyMarks[progressionData.progressionHash],
 			type: hashes.weeklyMarks[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
 			title: 'Weekly',
 			current: adjustedLevel,
@@ -427,8 +431,8 @@ $(function() {
 			var self = $(this);
 			navpills.removeClass('active');
 			self.addClass('active');
-			tabs.hide();
-			results.find('.' + self.text().toLowerCase()).show();
+			tabs.find('.tab').hide();
+			tabs.find('.' + self.text().toLowerCase()).show();
 		});
 	}
 

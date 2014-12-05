@@ -87,12 +87,14 @@ li a {
 .results {
 	display: none;
 }
+.tab {
+	display: none;
+}
 .results .characters {
 	margin-top:10px;
 }
 .results .character-container {
 	margin-top:30px;
-	max-width: 500px;
 }
 .results .character-link {
 	font-weight:bold;
