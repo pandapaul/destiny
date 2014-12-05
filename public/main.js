@@ -106,6 +106,7 @@ $(function() {
 		}).done(function(res){
 			playerData = res;		
 			sortPlayerData();
+			mapPlayerData();
 			displayPlayerData();
 			stopLoading(playerData.error);
 		}).fail(function(err){
@@ -116,6 +117,7 @@ $(function() {
 	function startLoading() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
+		results.hide();
 		characters.empty();
 	}
 
@@ -138,6 +140,24 @@ $(function() {
 		});
 	}
 
+	function mapPlayerData() {
+		for(var i=0; i<playerData.characters.length;i++) {
+			mapCharacterData(playerData.characters[i]);
+		}
+	}
+
+
+	//TODO figure out how to eloquently map all the char data to box data
+	function mapCharacterData(character) {
+		var characterBox = {
+			label: character.level + hashes[character.classHash],
+			type: hashes[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
+			title: 'Rank ' + progressionData.level,
+			current: progressionData.progressToNextLevel,
+			max: progressionData.nextLevelAt
+		};
+	}
+
 	function displayPlayerData() {
 		if(!playerData.characters || !playerData.characters.length) {
 			return;
@@ -147,9 +167,27 @@ $(function() {
 		}
 	}
 
+	function displayCharacterData(character) {
+		displayCurrentCharacterData();
+		displayWeeklyCharacterData();
+		displayDailyCharacterData();
+
+		function displayCurrentCharacterData() {
+			
+		}
+
+		function displayWeeklyCharacterData() {
+
+		}
+
+		function displayDailyCharacterData() {
+
+		}
+	}
+
 	//TODO gyahhhh cleanup
 	function displayCharacterData(character) {
-		tabs.find('.current').show();
+		
 		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
 			mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
@@ -393,12 +431,6 @@ $(function() {
 		}
 	});
 
-	function scrollToDiv(div) {
-		var pos = div.offset();
-		pos.top -= headerHeight;
-		scrollTo(pos.left, pos.top);
-	}
-
 	function setupNavigation() {
 		var headerHeight = parseInt($('.header').css('height')),
 		coolStuffDiv = $('.cool-stuff'),
@@ -406,6 +438,12 @@ $(function() {
 		contactDiv = $('.contact'),
 		contributingDiv = $('.contributing'),
 		navpills = $('.nav-pills li');
+
+		function scrollToDiv(div) {
+			var pos = div.offset();
+			pos.top -= headerHeight;
+			scrollTo(pos.left, pos.top);
+		}
 
 		$('.search-link').on('click', function() {
 			scrollTo(0,0);
