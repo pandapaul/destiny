@@ -155,6 +155,11 @@ function Searcher(username, membershipType) {
 			character.raceHash = resCharacter.characterBase.raceHash;
 			character.genderHash = resCharacter.characterBase.genderHash;
 			character.classHash = resCharacter.characterBase.classHash;
+			character.percentToNextLevel = resCharacter.percentToNextLevel;
+			character.customization = {
+				emblemPath: resCharacter.emblemPath,
+				backgroundPath: resCharacter.backgroundPath
+			};
 			characters.push(character);
 		}
 		self.result.characters = characters;
@@ -339,6 +344,7 @@ function Stasher(data) {
 
 	function upsertCharacter(character) {
 		character.membership = self.data.membership;
+		delete character.customization;
 		character.updated = new Date();
 		var condition = {
 			'id': character.id,

@@ -18,15 +18,18 @@ $(function() {
 			671679327: 'hunter',
 			3655393761: 'titan',
 			2271682572: 'warlock',
-			3871980777: 'New Monarchy',
-			529303302: 'Cryptarch',
-			2161005788: 'Iron Banner',
-			452808717: 'Queen',
-			3233510749: 'Vanguard',
-			1357277120: 'Crucible',
-			2778795080: 'Dead Orbit',
-			1424722124: 'Future War Cult',
-			174528503: 'Eris Morn',
+			2030054750: 'Mote of Light',
+			factions: {
+				529303302: 'Cryptarch',
+				3233510749: 'Vanguard',
+				1357277120: 'Crucible',
+				2778795080: 'Dead Orbit',
+				1424722124: 'Future War Cult',
+				3871980777: 'New Monarchy',
+				452808717: 'Queen',
+				2161005788: 'Iron Banner',
+				174528503: 'Eris Morn'
+			},
 			weeklyMarks: {
 				2033897742: 'Vanguard Marks',
 				2033897755: 'Crucible Marks'
@@ -78,7 +81,14 @@ $(function() {
 			vaultOfGlass: {
 				2659248071: {name: "Vault of Glass", level: 26},
 				2659248068: {name: "Vault of Glass", level: 30}
-			}
+			},
+			caps: {
+				3159615086: 25000,
+				1415355184: 200,
+				1415355173: 200,
+				2033897742: 100,
+				2033897755: 100
+			},
 		},
 		playerData = {};
 
@@ -141,104 +151,188 @@ $(function() {
 	}
 
 	function mapPlayerData() {
-		for(var i=0; i<playerData.characters.length;i++) {
-			mapCharacterData(playerData.characters[i]);
+		getRecentResetDates();
+		mapAllCharacters();
+
+		function getRecentResetDates() {
+			playerData.mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset();
+			playerData.mostRecentDailyReset = getDateOfMostRecentDailyReset();
+		}
+
+		function mapAllCharacters() {
+			for(var i=0; i<playerData.characters.length;i++) {
+				mapCharacterData(playerData.characters[i]);
+			}
 		}
 	}
 
-
-	//TODO figure out how to eloquently map all the char data to box data
 	function mapCharacterData(character) {
-		var characterBox = {
-			label: character.level + hashes[character.classHash],
-			type: hashes[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
-			title: 'Rank ' + progressionData.level,
-			current: progressionData.progressToNextLevel,
-			max: progressionData.nextLevelAt
-		};
-	}
+		calculatePlayedSinceReset();
+		initializeBoxes();
+		mapLight();
+		mapCurrencies();
+		mapActivities();
+		mapFactions();
 
-	function displayPlayerData() {
-		if(!playerData.characters || !playerData.characters.length) {
-			return;
-		}
-		for(var i=0; i<playerData.characters.length;i++) {
-			displayCharacterData(playerData.characters[i]);
-		}
-	}
-
-	function displayCharacterData(character) {
-		displayCurrentCharacterData();
-		displayWeeklyCharacterData();
-		displayDailyCharacterData();
-
-		function displayCurrentCharacterData() {
-			
+		function calculatePlayedSinceReset() {
+			var characterDate = new Date(character.dateLastPlayed);
+			character.playedSinceWeeklyReset = characterDate - playerData.mostRecentWeeklyReset > 0;
+			character.playedSinceDailyReset = characterDate - playerData.mostRecentDailyReset > 0;
 		}
 
-		function displayWeeklyCharacterData() {
-
+		function initializeBoxes() {
+			character.boxes = {};
+			character.boxes.current = {
+				light: {},
+				currencies: [],
+				factions: []
+			};
+			character.boxes.weekly = {
+				currencies: {},
+				factions: [],
+				activities: []
+			};
+			character.boxes.daily = {
+				currencies: {},
+				factions: []
+			};
 		}
-
-		function displayDailyCharacterData() {
-
-		}
-	}
-
-	//TODO gyahhhh cleanup
-	function displayCharacterData(character) {
 		
-		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
-			mostRecentDailyReset = getDateOfMostRecentDailyReset();
-		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
-		var d = $('<div class="container character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
-		
-		//currencies  TODO cleanup
-		var currencyCount = 0;
-		$.each(character.inventory.currencies, function(hash, currency) {
-			d.append(' ' + currency.value + ' ' + hashes[hash]);
-			currencyCount++;
-			if(currencyCount<3) {
-				d.append(',');
-			}
-		});
-
-		//TODO cleanup
-		var a = $('<div/>')
-				.addClass('character-activities')
-				.appendTo(d),
-			w = $('<div/>')
-				.addClass('character-weekly-marks')
-				.appendTo(d),
-			characterDate = new Date(character.dateLastPlayed),
-			playedSinceWeeklyReset = characterDate - mostRecentWeeklyReset > 0;
-			playedSinceDailyReset = characterDate - mostRecentDailyReset > 0;
-		
-		//show activities
-		if(playedSinceWeeklyReset) {
-			showActivityCompletion(a, character.activities);
-		} else {
-			showActivityCompletion(a);
+		function mapLight() {
+			var bungiePathPrefix = '//bungie.net';
+			character.boxes.current.light = {
+				title: hashes[character.classHash] + ' ' + character.level,
+				type: 'light',
+				label: playerData.membership.displayName,
+				iconPath: bungiePathPrefix + character.customization.emblemPath,
+				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
+				percentToNextLevel: character.percentToNextLevel,
+				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash]
+			};
 		}
+		
+		function mapCurrencies() {
+			character.boxes.current.currencies = [];
+			$.each(character.inventory.currencies, function(hash, currency) {
+				character.boxes.current.currencies.push({
+					title: hashes[hash],
+					type: hashes[hash].toLowerCase().replace(/\s/g, '-'),
+					label: hashes[hash],
+					progress: currency.value,
+					max: hashes.caps[hash]
+				});
+			});
 
-		//show progression
-		//TODO cleanup
-		$.each(character.progressions, function(hash, progression) {
-			progression.characterDate = characterDate;
-			progression.playedSinceWeeklyReset = playedSinceWeeklyReset;
-			progression.playedSinceDailyReset = playedSinceDailyReset;
-			progression.progressionHash = hash;
-			if(hashes[hash]) {
-				d.append(buildFactionBar(progression));
-			} else if(hashes.weeklyMarks[hash]) {
-				if(!playedSinceWeeklyReset) {
-					progression.level = 0;
+			character.boxes.weekly.currencies = {
+				vanguardMarks: {
+					title: 'Weekly',
+					type: 'vanguard-marks',
+					label: 'Weekly Vanguard Marks',
+					progress: character.progressions[2033897742].level,
+					max: hashes.caps[2033897742]
+				},
+				crucibleMarks: {
+					title: 'Weekly',
+					type: 'crucible-marks',
+					label: 'Weekly Crucible Marks',
+					progress: character.progressions[2033897755].level,
+					max: hashes.caps[2033897755]
 				}
-				w.append(buildWeeklyMarksBar(progression));
-			}
-		});
+			};
 
-		d.appendTo(characters);
+			character.boxes.daily.currencies = {
+				vanguardMarks: {
+					title: 'Daily',
+					type: 'vanactguard-marks',
+					label: 'Daily Vanguard Marks',
+					progress: character.progressions[2033897742].dailyProgress,
+					max: hashes.caps[2033897742]
+				},
+				crucibleMarks: {
+					title: 'Daily',
+					type: 'crucible-marks',
+					label: 'Daily Crucible Marks',
+					progress: character.progressions[2033897755].dailyProgress,
+					max: hashes.caps[2033897755]
+				}
+			};
+
+		}
+
+		function mapActivities() {
+
+			var nightfallHash,
+				heroicHash,
+				heroicHighestLevel,
+				heroicProgress = 0,
+				heroicMax = 0;
+
+			$.each(character.activities, function(hash, activity) {
+				if(hashes.weeklyNightfalls[hash]) {
+					nightfallHash = hash;
+				} else if(hashes.weeklyHeroics[hash]){
+					heroicMax += hashes.weeklyHeroics[hash].level;
+					if(!heroicHash) {
+						heroicHash = hash;
+					}
+					if(activity.isCompleted) {
+						heroicProgress += hashes.weeklyHeroics[hash].level;
+						if (hashes.weeklyHeroics[hash].level > highestHeroicLevel) {
+							heroicHash = hash;
+							highestHeroicLevel = hashes.weeklyHeroics[hash].level;
+						}
+					}
+				}
+			});
+
+			character.boxes.weekly.activities = {};
+			if(nightfallHash) {
+				character.boxes.weekly.activities.nightfall = {
+					title: hashes.weeklyNightfalls[nightfallHash],
+					type: 'nightfall',
+					label: 'Weekly Nightfall',
+					progress: character.activities[nightfallHash].isCompleted? 1 : 0,
+					max: 1
+				};
+			}
+			if(heroicHash) {
+				character.boxes.weekly.activities.heroic = {
+					title: hashes.weeklyHeroics[heroicHash].name + hashes.weeklyHeroics[heroicHash].level,
+					type: 'weekly-heroic',
+					label: 'Weekly Heroic',
+					progress: heroicProgress,
+					max: heroicMax
+				};
+			}
+		}
+
+		function mapFactions() {
+			$.each(hashes.factions, function(hash, faction) {
+				var type = faction.toLowerCase().replace(/\s/g, '-');
+				character.boxes.current.factions.push({
+					title: 'Rank ' + (character.progressions[hash].level || 0),
+					type: type,
+					label: faction,
+					progress: character.progressions[hash].progressToNextLevel,
+					max: character.progressions[hash].nextLevelAt
+				});
+				character.boxes.weekly.factions.push({
+					title: 'Weekly/Lifetime',
+					type: type,
+					label: faction,
+					progress: character.progressions[hash].weeklyProgress,
+					max: character.progressions[hash].currentProgress
+				});
+				character.boxes.daily.factions.push({
+					title: 'Daily/Weekly',
+					type: type,
+					label: faction,
+					progress: character.progressions[hash].dailyProgress,
+					max: character.progressions[hash].weeklyProgress
+				});
+			});
+		}
+
 	}
 
 	function getDateOfMostRecentDailyReset() {
@@ -268,53 +362,62 @@ $(function() {
 		return date;
 	}
 
-	function showActivityCompletion(div, activities) {
-		var activity = null,
-			heroic = null,
-			nightfall = null,
-			vog = null;
-		if(activities) {
-			$.each(activities, function(hash, activity) {
-				if(activity.isCompleted) {
-					activity = hashes.weeklyHeroics[hash];
-					if((activity && !heroic) || (activity && heroic && activity.level > heroic.level)) {
-						heroic = activity;
-						return;
-					}
-					activity = hashes.weeklyNightfalls[hash];
-					if(activity) {
-						nightfall = activity;
-						return;
-					}
-					activity = hashes.vaultOfGlass[hash];
-					if((activity && !vog) || (activity && vog && activity.level > vog.level)) {
-						vog = activity;
-						return;
-					}
-				}
-			});
+	function displayPlayerData() {
+		if(!playerData.characters || !playerData.characters.length) {
+			return;
 		}
-		var heroicCompletionText = 'Weekly Heroic ';
-		if(heroic) {
-			heroicCompletionText += '(' + heroic.level + ') Complete';
-		} else {
-			heroicCompletionText += 'Incomplete';
+		for(var i=0; i<playerData.characters.length;i++) {
+			displayCharacterData(playerData.characters[i]);
 		}
-		var nightfallCompletionText = 'Weekly Nightfall ';
-		if(nightfall) {
-			nightfallCompletionText += 'Complete';
-		} else {
-			nightfallCompletionText += 'Incomplete';
+	}
+
+	function displayCharacterData(character) {
+		displayCurrentCharacterData();
+		displayWeeklyCharacterData();
+		displayDailyCharacterData();
+
+		function displayCurrentCharacterData() {
+			var tab = tabs.find('.current'),
+				container = $('<div/>').appendClass('container');
+			buildBox(character.boxes.current.light).appendTo(container);
+			container.appendTo(tab);
 		}
-		var vogCompletionText = 'Vault of Glass ';
-		if(vog) {
-			vogCompletionText += '(' + vog.level + ') Complete';
-		} else {
-			vogCompletionText += 'Incomplete';
+
+		function displayWeeklyCharacterData() {
+
 		}
-		div.append($('<span/>').text(heroicCompletionText + ', '))
-			.append($('<span/>').text(nightfallCompletionText))
-			.append($('<div/>').text(vogCompletionText));
+
+		function displayDailyCharacterData() {
+
+		}
+	}
+
+	function buildBox(data) {
+		var container = $('<div/>')
+				.addClass('progress-container')
+				.addClass(data.type),
+			icon = $('<div/>')
+				.addClass('icon')
+				.prop('alt',data.label),
+			progressbar = $('<div/>')
+				.addClass('progress-bar')
+				.height((data.percentToNextLevel || data.progress/data.max*100) + '%'),
+			amount = $('<div/>')
+				.addClass('amount')
+				.text(data.footer || (data.progress + '/' + data.max)),
+			title = $('<div/>')
+				.addClass('title')
+				.text(data.title);
+
+		if(data.iconPath) {
+			icon.css('background-image', 'url(' + data.iconPath + ')');
+		}
+
+		if(data.backgroundPath) {
+			container.css('background-image', 'url(' + data.backgroundPath + ')');
+		}
+
+		return container.append(title, icon, progressbar, amount);
 	}
 
 	function showMessage(msg) {
@@ -355,52 +458,6 @@ $(function() {
 
 	function updateHash() {
 		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
-	}
-
-	function buildFactionBar(progressionData) {
-		var progress = {
-			label: hashes[progressionData.progressionHash],
-			type: hashes[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
-			title: 'Rank ' + progressionData.level,
-			current: progressionData.progressToNextLevel,
-			max: progressionData.nextLevelAt
-		};
-		return buildProgressBar(progress);
-	}
-
-	function buildProgressBar(progress) {
-		var container = $('<div/>')
-				.addClass('progress-container')
-				.addClass(progress.type),
-			icon = $('<div/>')
-				.addClass('icon')
-				.prop('alt',progress.label),
-			progressbar = $('<div/>')
-				.addClass('progress-bar')
-				.height(progress.current/progress.max*100 + '%'),
-			amount = $('<div/>')
-				.addClass('amount')
-				.text(progress.current + '/' + progress.max),
-			title = $('<div/>')
-				.addClass('title')
-				.text(progress.title);
-
-		return container.append(title, icon, progressbar, amount);
-	}
-
-	function buildWeeklyMarksBar(progressionData) {
-		var adjustedLevel = 0;
-		if(progressionData.playedSinceWeeklyReset) {
-			adjustedLevel = progressionData.level;
-		}
-		var progress = {
-			label: hashes.weeklyMarks[progressionData.progressionHash],
-			type: hashes.weeklyMarks[progressionData.progressionHash].toLowerCase().replace(/ /g,'-'),
-			title: 'Weekly',
-			current: adjustedLevel,
-			max: 100
-		};
-		return buildProgressBar(progress);
 	}
 
 	function updateFormFromHash() {
