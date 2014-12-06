@@ -128,7 +128,8 @@ $(function() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
 		results.hide();
-		characters.empty();
+		tabs.find('.tab').empty();
+		tabs.find('.current').show();
 	}
 
 	function stopLoading(err) {
@@ -207,7 +208,8 @@ $(function() {
 				iconPath: bungiePathPrefix + character.customization.emblemPath,
 				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
 				percentToNextLevel: character.percentToNextLevel,
-				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash]
+				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
+				progressColor: 'rgba(245, 220, 86,0.5)'
 			};
 		}
 		
@@ -263,7 +265,7 @@ $(function() {
 
 			var nightfallHash,
 				heroicHash,
-				heroicHighestLevel,
+				highestHeroicLevel = 0,
 				heroicProgress = 0,
 				heroicMax = 0;
 
@@ -378,8 +380,18 @@ $(function() {
 
 		function displayCurrentCharacterData() {
 			var tab = tabs.find('.current'),
-				container = $('<div/>').appendClass('container');
+				container = $('<div/>').addClass('container');
+
 			buildBox(character.boxes.current.light).appendTo(container);
+
+			$.each(character.boxes.current.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.current.factions, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
 			container.appendTo(tab);
 		}
 
@@ -415,6 +427,10 @@ $(function() {
 
 		if(data.backgroundPath) {
 			container.css('background-image', 'url(' + data.backgroundPath + ')');
+		}
+
+		if(data.progressColor) {
+			progressbar.css('background-color', data.progressColor);
 		}
 
 		return container.append(title, icon, progressbar, amount);
