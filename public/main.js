@@ -121,7 +121,6 @@ $(function() {
 		button.attr('disabled',true);
 		results.hide();
 		tabs.find('.tab').empty();
-		tabs.find('.current').show();
 	}
 
 	function stopLoading(err) {
@@ -129,9 +128,10 @@ $(function() {
 			showError(err);
 		} else {
 			message.empty();
+			scrollToDiv(results);
 		}
 		button.attr('disabled',false);
-		tabs.find('.current').click();
+		$('.nav-tabs li').get(0).click();
 	}
 
 	function sortPlayerData() {
@@ -196,6 +196,7 @@ $(function() {
 		function mapLight() {
 			var bungiePathPrefix = '//bungie.net';
 			character.boxes.current.light = {
+				isHeader: true,
 				title: hashes[character.classHash] + ' ' + character.level,
 				type: 'light',
 				label: playerData.membership.displayName,
@@ -215,6 +216,20 @@ $(function() {
 				label: 'Next Mote of Light',
 				progress: character.progressions[2030054750].progressToNextLevel,
 				max: character.progressions[2030054750].nextLevelAt
+			};
+			character.boxes.weekly.motes = {
+				title: 'Weekly/Lifetime',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].weeklyProgress,
+				max: character.progressions[2030054750].currentProgress
+			};
+			character.boxes.daily.motes = {
+				title: 'Daily/Weekly',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].dailyProgress,
+				max: character.progressions[2030054750].weeklyProgress
 			};
 		}
 		
@@ -250,7 +265,7 @@ $(function() {
 			character.boxes.daily.currencies = {
 				vanguardMarks: {
 					title: 'Daily',
-					type: 'vanactguard-marks',
+					type: 'vanguard-marks',
 					label: 'Daily Vanguard Marks',
 					progress: character.progressions[2033897742].dailyProgress,
 					max: hashes.caps[2033897742]
@@ -425,6 +440,8 @@ $(function() {
 
 			buildBox(character.boxes.current.light).appendTo(container);
 
+			buildBox(character.boxes.weekly.motes).appendTo(container);
+
 			$.each(character.boxes.weekly.currencies, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
@@ -444,6 +461,8 @@ $(function() {
 
 			buildBox(character.boxes.current.light).appendTo(container);
 
+			buildBox(character.boxes.daily.motes).appendTo(container);
+
 			$.each(character.boxes.daily.currencies, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
@@ -455,8 +474,8 @@ $(function() {
 	}
 
 	function buildBox(data) {
-		var container = $('<div/>')
-				.addClass('progress-container')
+		var box = $('<div/>')
+				.addClass(data.isHeader? 'header-box' : 'progress-box')
 				.addClass(data.type),
 			icon = $('<div/>')
 				.addClass('icon')
@@ -469,14 +488,14 @@ $(function() {
 				.text(data.footer || (data.progress + '/' + data.max)),
 			title = $('<div/>')
 				.addClass('title')
-				.text(data.title);
+				.html(data.title);
 
 		if(data.iconPath) {
 			icon.css('background-image', 'url(' + data.iconPath + ')');
 		}
 
 		if(data.backgroundPath) {
-			container.css('background-image', 'url(' + data.backgroundPath + ')');
+			box.css('background-image', 'url(' + data.backgroundPath + ')');
 		}
 
 		if(data.progressColor) {
@@ -484,13 +503,13 @@ $(function() {
 		}
 
 		if(data.link) {
-			container.css('cursor','pointer');
-			container.on('click', function() {
+			box.css('cursor','pointer');
+			box.on('click', function() {
 				open(data.link, '_blank');
 			});
 		}
 
-		return container.append(title, icon, progressbar, amount);
+		return box.append(icon, title, amount, progressbar);
 	}
 
 	function showMessage(msg) {
@@ -561,19 +580,18 @@ $(function() {
 		}
 	});
 
+	function scrollToDiv(div) {
+		var pos = div.offset();
+		pos.top -= parseInt($('.header').css('height'));
+		scrollTo(pos.left, pos.top);
+	}
+
 	function setupNavigation() {
-		var headerHeight = parseInt($('.header').css('height')),
-		coolStuffDiv = $('.cool-stuff'),
+		var coolStuffDiv = $('.cool-stuff'),
 		aboutDiv = $('.about'),
 		contactDiv = $('.contact'),
 		contributingDiv = $('.contributing'),
-		navpills = $('.nav-pills li');
-
-		function scrollToDiv(div) {
-			var pos = div.offset();
-			pos.top -= headerHeight;
-			scrollTo(pos.left, pos.top);
-		}
+		navpills = $('.nav-tabs li');
 
 		$('.search-link').on('click', function() {
 			scrollTo(0,0);
