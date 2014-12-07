@@ -115,9 +115,18 @@ a {
 .character-container {
 	width: 100%;
 	margin-top: 2em;
-	padding-bottom: 1.5em;
+	padding-bottom: 1em;
 	background-color: rgba(85, 85, 85, 0.2);
 	border: 1px solid rgba(85, 85, 85, 0.3);
+}
+.timestamp-header {
+	background-color: rgba(85, 85, 85, 0.2);
+	border: 1px solid rgba(85, 85, 85, 0.3);
+	text-align: left;
+	width: 100%;
+	font-size: 0.85em;
+	margin-bottom: 1em;
+	padding-left: 0.5em;
 }
 .header-box {
 	color: #fff;
@@ -127,7 +136,6 @@ a {
     background-color: rgb(65,65,65);
     border: 1px solid rgb(0,0,0);
     position: relative;
-    margin-bottom: 1em;
     background-size: 100% 100%;
 }
 .header-box .progress-bar {
@@ -149,6 +157,12 @@ a {
 	font-size:1.5em;
 	font-weight: bold;
     z-index:1;
+}
+.header-box .subtitle {
+	position: absolute;
+	top: 1.75em;
+	right: 0.8em;
+	z-index: 1;
 }
 .header-box .amount {
 	position: absolute;

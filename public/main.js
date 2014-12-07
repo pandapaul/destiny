@@ -376,8 +376,8 @@ $(function() {
 
 	}
 
-	function getDateOfMostRecentDailyReset() {
-		var date = new Date();
+	function getDateOfMostRecentDailyReset(date) {
+		date = date || new Date();
 		if(date.getUTCHours() < 9) {
 			date.setUTCDate(date.getUTCDate() - 1);
 		}
@@ -388,8 +388,8 @@ $(function() {
 		return date;
 	}
 
-	function getDateOfMostRecentWeeklyReset() {
-		var date = new Date();
+	function getDateOfMostRecentWeeklyReset(date) {
+		date = date || new Date();
 		var currentDayOfWeek = date.getUTCDay();
 		var distanceToMostRecentTuesday = currentDayOfWeek - 2;
 		if(distanceToMostRecentTuesday < 0 || (distanceToMostRecentTuesday === 0 && date.getUTCHours() < 9)) {
@@ -413,6 +413,10 @@ $(function() {
 	}
 
 	function displayCharacterData(character) {
+		var characterDate = new Date(character.dateLastPlayed),
+			weeklyReset = getDateOfMostRecentWeeklyReset(characterDate),
+			dailyReset = getDateOfMostRecentDailyReset(characterDate);
+
 		displayCurrentCharacterData();
 		displayWeeklyCharacterData();
 		displayDailyCharacterData();
@@ -422,6 +426,11 @@ $(function() {
 				container = $('<div/>').addClass('character-container').appendTo(tab);
 
 			buildBox(character.boxes.current.light).appendTo(container);
+
+			$('<div/>')
+				.addClass('timestamp-header')
+				.text('Last played on ' + moment(characterDate).format('dddd MMMM D, YYYY H:mm'))
+				.appendTo(container);
 
 			buildBox(character.boxes.current.motes).appendTo(container);
 
@@ -439,6 +448,11 @@ $(function() {
 				container = $('<div/>').addClass('character-container').appendTo(tab);
 
 			buildBox(character.boxes.current.light).appendTo(container);
+
+			$('<div/>')
+				.addClass('timestamp-header')
+				.text('Since weekly reset on ' + moment(weeklyReset).format('dddd MMMM D, YYYY H:mm'))
+				.appendTo(container);
 
 			buildBox(character.boxes.weekly.motes).appendTo(container);
 
@@ -460,6 +474,11 @@ $(function() {
 				container = $('<div/>').addClass('character-container').appendTo(tab);
 
 			buildBox(character.boxes.current.light).appendTo(container);
+
+			$('<div/>')
+				.addClass('timestamp-header')
+				.text('Since daily reset on ' + moment(dailyReset).format('dddd MMMM D, YYYY H:mm'))
+				.appendTo(container);
 
 			buildBox(character.boxes.daily.motes).appendTo(container);
 
@@ -489,6 +508,13 @@ $(function() {
 			title = $('<div/>')
 				.addClass('title')
 				.html(data.title);
+
+		if(data.subtitle) {
+			$('<div/>')
+				.addClass('subtitle')
+				.text(data.subtitle)
+				.appendTo(box);
+		}
 
 		if(data.iconPath) {
 			icon.css('background-image', 'url(' + data.iconPath + ')');
