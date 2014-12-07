@@ -376,8 +376,8 @@ $(function() {
 
 	}
 
-	function getDateOfMostRecentDailyReset(date) {
-		date = date || new Date();
+	function getDateOfMostRecentDailyReset(dateLastPlayed) {
+		var date = dateLastPlayed? new Date(dateLastPlayed) : new Date();
 		if(date.getUTCHours() < 9) {
 			date.setUTCDate(date.getUTCDate() - 1);
 		}
@@ -388,8 +388,8 @@ $(function() {
 		return date;
 	}
 
-	function getDateOfMostRecentWeeklyReset(date) {
-		date = date || new Date();
+	function getDateOfMostRecentWeeklyReset(dateLastPlayed) {
+		var date = dateLastPlayed? new Date(dateLastPlayed) : new Date();
 		var currentDayOfWeek = date.getUTCDay();
 		var distanceToMostRecentTuesday = currentDayOfWeek - 2;
 		if(distanceToMostRecentTuesday < 0 || (distanceToMostRecentTuesday === 0 && date.getUTCHours() < 9)) {
