@@ -199,7 +199,7 @@ $(function() {
 				isHeader: true,
 				title: hashes[character.classHash] + ' ' + character.level,
 				type: 'light',
-				label: playerData.membership.displayName,
+				label: 'Click to view on Bungie.net',
 				iconPath: bungiePathPrefix + character.customization.emblemPath,
 				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
 				percentToNextLevel: 0,
@@ -495,10 +495,10 @@ $(function() {
 	function buildBox(data) {
 		var box = $('<div/>')
 				.addClass(data.isHeader? 'header-box' : 'progress-box')
-				.addClass(data.type),
-			icon = $('<div/>')
-				.addClass('icon')
+				.addClass(data.type)
 				.prop('title',data.label),
+			icon = $('<div/>')
+				.addClass('icon'),
 			progressbar = $('<div/>')
 				.addClass('progress-bar')
 				.height((data.percentToNextLevel || data.progress/data.max*100 || 0) + '%'),
