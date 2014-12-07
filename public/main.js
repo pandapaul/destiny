@@ -7,29 +7,18 @@ $(function() {
 		message = $('.message'),
 		selectedAccountType = 2,
 		hashes = {
-			3159615086: 'glimmer',
-			1415355184: 'crucible marks',
-			1415355173: 'vanguard marks',
-			898834093: 'exo',
-			3887404748: 'human',
-			2803282938: 'awoken',
-			3111576190: 'male',
-			2204441813: 'female',
-			671679327: 'hunter',
-			3655393761: 'titan',
-			2271682572: 'warlock',
+			3159615086: 'Glimmer',
+			1415355184: 'Crucible Marks',
+			1415355173: 'Vanguard Marks',
+			898834093: 'Exo',
+			3887404748: 'Human',
+			2803282938: 'Awoken',
+			3111576190: 'Male',
+			2204441813: 'Female',
+			671679327: 'Hunter',
+			3655393761: 'Titan',
+			2271682572: 'Warlock',
 			2030054750: 'Mote of Light',
-			factions: {
-				529303302: 'Cryptarch',
-				3233510749: 'Vanguard',
-				1357277120: 'Crucible',
-				2778795080: 'Dead Orbit',
-				1424722124: 'Future War Cult',
-				3871980777: 'New Monarchy',
-				452808717: 'Queen',
-				2161005788: 'Iron Banner',
-				174528503: 'Eris Morn'
-			},
 			weeklyMarks: {
 				2033897742: 'Vanguard Marks',
 				2033897755: 'Crucible Marks'
@@ -114,10 +103,13 @@ $(function() {
 			contentType:'application/json; charset=utf-8',
 			dataType:'json'
 		}).done(function(res){
-			playerData = res;		
-			sortPlayerData();
-			mapPlayerData();
-			displayPlayerData();
+			playerData = res;
+			if(playerData.characters) {
+				sortPlayerData();
+				mapPlayerData();
+				displayPlayerData();
+				results.show();
+			}
 			stopLoading(playerData.error);
 		}).fail(function(err){
 			stopLoading(err);
@@ -139,7 +131,7 @@ $(function() {
 			message.empty();
 		}
 		button.attr('disabled',false);
-		results.show();
+		tabs.find('.current').click();
 	}
 
 	function sortPlayerData() {
@@ -171,6 +163,7 @@ $(function() {
 		calculatePlayedSinceReset();
 		initializeBoxes();
 		mapLight();
+		mapMotes();
 		mapCurrencies();
 		mapActivities();
 		mapFactions();
@@ -185,6 +178,7 @@ $(function() {
 			character.boxes = {};
 			character.boxes.current = {
 				light: {},
+				motes: {},
 				currencies: [],
 				factions: []
 			};
@@ -207,9 +201,20 @@ $(function() {
 				label: playerData.membership.displayName,
 				iconPath: bungiePathPrefix + character.customization.emblemPath,
 				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
-				percentToNextLevel: character.percentToNextLevel,
+				percentToNextLevel: 0,
 				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
-				progressColor: 'rgba(245, 220, 86,0.5)'
+				progressColor: '#f5dc56',
+				link: 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id + '/#gear'
+			};
+		}
+
+		function mapMotes() {
+			character.boxes.current.motes = {
+				title: 'Mote of Light',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].progressToNextLevel,
+				max: character.progressions[2030054750].nextLevelAt
 			};
 		}
 		
@@ -291,44 +296,63 @@ $(function() {
 			if(nightfallHash) {
 				character.boxes.weekly.activities.nightfall = {
 					title: hashes.weeklyNightfalls[nightfallHash],
-					type: 'nightfall',
+					type: 'strike',
 					label: 'Weekly Nightfall',
 					progress: character.activities[nightfallHash].isCompleted? 1 : 0,
-					max: 1
+					max: 1,
+					footer: 'Nightfall'
 				};
 			}
 			if(heroicHash) {
 				character.boxes.weekly.activities.heroic = {
-					title: hashes.weeklyHeroics[heroicHash].name + hashes.weeklyHeroics[heroicHash].level,
-					type: 'weekly-heroic',
+					title: hashes.weeklyHeroics[heroicHash].name,
+					type: 'strike',
 					label: 'Weekly Heroic',
 					progress: heroicProgress,
-					max: heroicMax
+					max: heroicMax,
+					footer: 'Heroic Level ' + hashes.weeklyHeroics[heroicHash].level
 				};
 			}
 		}
 
 		function mapFactions() {
-			$.each(hashes.factions, function(hash, faction) {
-				var type = faction.toLowerCase().replace(/\s/g, '-');
+
+			factions = [
+				{hash: 529303302, name: 'Cryptarch'},
+				{hash: 3233510749, name: 'Vanguard'},
+				{hash: 1357277120, name: 'Crucible'},
+				{hash: 2778795080, name: 'Dead Orbit'},
+				{hash: 1424722124, name: 'Future War Cult'},
+				{hash: 3871980777, name: 'New Monarchy'},
+				{hash: 452808717, name: 'Queen'},
+				{hash: 2161005788, name: 'Iron Banner'},
+				{hash: 174528503, name: 'Eris Morn'}
+			];
+
+			$.each(factions, function(i, faction) {
+				var hash = faction.hash;
+				if(!character.progressions[hash]) {
+					return;
+				}
+				var type = faction.name.toLowerCase().replace(/\s/g, '-');
 				character.boxes.current.factions.push({
 					title: 'Rank ' + (character.progressions[hash].level || 0),
 					type: type,
-					label: faction,
+					label: faction.name,
 					progress: character.progressions[hash].progressToNextLevel,
 					max: character.progressions[hash].nextLevelAt
 				});
 				character.boxes.weekly.factions.push({
 					title: 'Weekly/Lifetime',
 					type: type,
-					label: faction,
+					label: faction.name,
 					progress: character.progressions[hash].weeklyProgress,
 					max: character.progressions[hash].currentProgress
 				});
 				character.boxes.daily.factions.push({
 					title: 'Daily/Weekly',
 					type: type,
-					label: faction,
+					label: faction.name,
 					progress: character.progressions[hash].dailyProgress,
 					max: character.progressions[hash].weeklyProgress
 				});
@@ -380,9 +404,11 @@ $(function() {
 
 		function displayCurrentCharacterData() {
 			var tab = tabs.find('.current'),
-				container = $('<div/>').addClass('container');
+				container = $('<div/>').addClass('character-container').appendTo(tab);
 
 			buildBox(character.boxes.current.light).appendTo(container);
+
+			buildBox(character.boxes.current.motes).appendTo(container);
 
 			$.each(character.boxes.current.currencies, function(i, val) {
 				buildBox(val).appendTo(container);
@@ -391,16 +417,40 @@ $(function() {
 			$.each(character.boxes.current.factions, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
-
-			container.appendTo(tab);
 		}
 
 		function displayWeeklyCharacterData() {
+			var tab = tabs.find('.weekly'),
+				container = $('<div/>').addClass('character-container').appendTo(tab);
 
+			buildBox(character.boxes.current.light).appendTo(container);
+
+			$.each(character.boxes.weekly.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.weekly.activities, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.weekly.factions, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
 		}
 
 		function displayDailyCharacterData() {
+			var tab = tabs.find('.daily'),
+				container = $('<div/>').addClass('character-container').appendTo(tab);
 
+			buildBox(character.boxes.current.light).appendTo(container);
+
+			$.each(character.boxes.daily.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.daily.factions, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
 		}
 	}
 
@@ -410,10 +460,10 @@ $(function() {
 				.addClass(data.type),
 			icon = $('<div/>')
 				.addClass('icon')
-				.prop('alt',data.label),
+				.prop('title',data.label),
 			progressbar = $('<div/>')
 				.addClass('progress-bar')
-				.height((data.percentToNextLevel || data.progress/data.max*100) + '%'),
+				.height((data.percentToNextLevel || data.progress/data.max*100 || 0) + '%'),
 			amount = $('<div/>')
 				.addClass('amount')
 				.text(data.footer || (data.progress + '/' + data.max)),
@@ -431,6 +481,13 @@ $(function() {
 
 		if(data.progressColor) {
 			progressbar.css('background-color', data.progressColor);
+		}
+
+		if(data.link) {
+			container.css('cursor','pointer');
+			container.on('click', function() {
+				open(data.link, '_blank');
+			});
 		}
 
 		return container.append(title, icon, progressbar, amount);

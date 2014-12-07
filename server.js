@@ -31,7 +31,8 @@ function initializeBungieStuff() {
 		1424722124: 'Future War Cult',
 		174528503: 'Eris Morn',
 		2033897742: 'Weekly Vanguard Marks',
-		2033897755: 'Weekly Crucible Marks'
+		2033897755: 'Weekly Crucible Marks',
+		2030054750: 'Mote of Light'
 	};
 }
 

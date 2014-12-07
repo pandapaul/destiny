@@ -56,7 +56,7 @@ a {
 	padding-bottom:50px;
 }
 .container {
-/*	max-width: 750px;*/
+	max-width: 750px;
 	margin-top: 10px;
 }
 .message {
@@ -66,6 +66,9 @@ a {
 .results {
 	text-align: center;
 	margin-top:10px;
+}
+.nav-pills {
+	min-width: 397px;
 }
 .results .nav li {
 	width: 33%;
@@ -89,17 +92,15 @@ li a {
 }
 .tab {
 	display: none;
+	margin-top: 2em;
 }
-.results .characters {
-	margin-top:10px;
-}
-.results .character-container {
-	margin-top:30px;
-}
-.results .character-link {
-	font-weight:bold;
-	color: rgb(206, 174, 50);
-	margin-right:10px;
+.character-container {
+	margin-top: 2em;
+	padding-top: 2em;
+	padding-bottom: 1.5em;
+	background-color: rgba(85, 85, 85, 0.2);
+	border: 1px solid rgba(85, 85, 85, 0.3);
+	border-radius: 5px;
 }
 .progress-container {
 	display: inline-block;
@@ -141,7 +142,10 @@ li a {
     width: 100%;
     height:1.2em;
     text-align: center;
-    bottom: 0;
+    bottom: 0.05em;
+}
+.mote-of-light .icon {
+	background-image: url('http://www.bungie.net/common/destiny_content/icons/icon37a92e53cba79ae3b6fd6d0a3d626498.jpg');
 }
 .glimmer .icon {
 	background-image: url("/icons/glimmer.png");
@@ -178,6 +182,12 @@ li a {
 }
 .new-monarchy .icon {
     background-image: url("/icons/newmonarchy.png");
+}
+.raid .icon {
+	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon7e65328ef867884c68f030903522ce00.png");
+}
+.strike .icon {
+	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon0078e439219debdc0c89724ecdba29cc.png");
 }
 .google-play-link {
 	margin-top:-2px;
