@@ -2,33 +2,26 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		results = $('.results'),
-		characters = $('.characters'),
+		characters = results.find('.characters'),
+		tabs = results.find('.tabs'),
 		message = $('.message'),
 		selectedAccountType = 2,
 		hashes = {
-			3159615086: 'glimmer',
-			1415355184: 'crucible marks',
-			1415355173: 'vanguard marks',
-			898834093: 'exo',
-			3887404748: 'human',
-			2803282938: 'awoken',
-			3111576190: 'male',
-			2204441813: 'female',
-			671679327: 'hunter',
-			3655393761: 'titan',
-			2271682572: 'warlock',
-			3871980777: 'New Monarchy',
-			529303302: 'Cryptarch',
-			2161005788: 'Iron Banner',
-			452808717: 'Queen',
-			3233510749: 'Vanguard',
-			1357277120: 'Crucible',
-			2778795080: 'Dead Orbit',
-			1424722124: 'Future War Cult',
-			174528503: 'Eris Morn',
+			3159615086: 'Glimmer',
+			1415355184: 'Crucible Marks',
+			1415355173: 'Vanguard Marks',
+			898834093: 'Exo',
+			3887404748: 'Human',
+			2803282938: 'Awoken',
+			3111576190: 'Male',
+			2204441813: 'Female',
+			671679327: 'Hunter',
+			3655393761: 'Titan',
+			2271682572: 'Warlock',
+			2030054750: 'Mote of Light',
 			weeklyMarks: {
-				2033897742: 'Weekly Vanguard Marks',
-				2033897755: 'Weekly Crucible Marks'
+				2033897742: 'Vanguard Marks',
+				2033897755: 'Crucible Marks'
 			},
 			weeklyHeroics: {
 				2591274210: {name: "The Devil's Lair", level: 22},
@@ -77,7 +70,14 @@ $(function() {
 			vaultOfGlass: {
 				2659248071: {name: "Vault of Glass", level: 26},
 				2659248068: {name: "Vault of Glass", level: 30}
-			}
+			},
+			caps: {
+				3159615086: 25000,
+				1415355184: 200,
+				1415355173: 200,
+				2033897742: 100,
+				2033897755: 100
+			},
 		},
 		playerData = {};
 
@@ -103,9 +103,13 @@ $(function() {
 			contentType:'application/json; charset=utf-8',
 			dataType:'json'
 		}).done(function(res){
-			playerData = res;		
-			sortPlayerData();
-			displayPlayerData();
+			playerData = res;
+			if(playerData.characters) {
+				sortPlayerData();
+				mapPlayerData();
+				displayPlayerData();
+				results.show();
+			}
 			stopLoading(playerData.error);
 		}).fail(function(err){
 			stopLoading(err);
@@ -115,7 +119,8 @@ $(function() {
 	function startLoading() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
-		characters.empty();
+		results.hide();
+		tabs.find('.tab').empty();
 	}
 
 	function stopLoading(err) {
@@ -123,9 +128,10 @@ $(function() {
 			showError(err);
 		} else {
 			message.empty();
+			scrollToDiv(results);
 		}
 		button.attr('disabled',false);
-		results.show();
+		$('.nav-tabs li').get(0).click();
 	}
 
 	function sortPlayerData() {
@@ -137,68 +143,237 @@ $(function() {
 		});
 	}
 
-	function displayPlayerData() {
-		if(!playerData.characters || !playerData.characters.length) {
-			return;
+	function mapPlayerData() {
+		getRecentResetDates();
+		mapAllCharacters();
+
+		function getRecentResetDates() {
+			playerData.mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset();
+			playerData.mostRecentDailyReset = getDateOfMostRecentDailyReset();
 		}
-		for(var i=0; i<playerData.characters.length;i++) {
-			displayCharacterData(playerData.characters[i]);
+
+		function mapAllCharacters() {
+			for(var i=0; i<playerData.characters.length;i++) {
+				mapCharacterData(playerData.characters[i]);
+			}
 		}
 	}
 
-	//TODO gyahhhh cleanup
-	function displayCharacterData(character) {
-		var mostRecentWeeklyReset = getDateOfMostRecentWeeklyReset(),
-			mostRecentDailyReset = getDateOfMostRecentDailyReset();
-		var profileHref = 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id;
-		var d = $('<div class="character-container"/>').html('<a class="character-link" href="' + profileHref + '">' + character.level + ' ' + hashes[character.genderHash] + ' ' + hashes[character.raceHash] + ' ' + hashes[character.classHash] + '</a>');
-		
-		//currencies  TODO cleanup
-		var currencyCount = 0;
-		$.each(character.inventory.currencies, function(hash, currency) {
-			d.append(' ' + currency.value + ' ' + hashes[hash]);
-			currencyCount++;
-			if(currencyCount<3) {
-				d.append(',');
-			}
-		});
+	function mapCharacterData(character) {
+		calculatePlayedSinceReset();
+		initializeBoxes();
+		mapLight();
+		mapMotes();
+		mapCurrencies();
+		mapActivities();
+		mapFactions();
 
-		//TODO cleanup
-		var a = $('<div/>')
-				.addClass('character-activities')
-				.appendTo(d),
-			w = $('<div/>')
-				.addClass('character-weekly-marks')
-				.appendTo(d),
-			characterDate = new Date(character.dateLastPlayed),
-			playedSinceWeeklyReset = characterDate - mostRecentWeeklyReset > 0;
-			playedSinceDailyReset = characterDate - mostRecentDailyReset > 0;
-		
-		//show activities
-		if(playedSinceWeeklyReset) {
-			showActivityCompletion(a, character.activities);
-		} else {
-			showActivityCompletion(a);
+		function calculatePlayedSinceReset() {
+			var characterDate = new Date(character.dateLastPlayed);
+			character.playedSinceWeeklyReset = characterDate - playerData.mostRecentWeeklyReset > 0;
+			character.playedSinceDailyReset = characterDate - playerData.mostRecentDailyReset > 0;
 		}
 
-		//show progression
-		//TODO cleanup
-		$.each(character.progressions, function(hash, progression) {
-			progression.characterDate = characterDate;
-			progression.playedSinceWeeklyReset = playedSinceWeeklyReset;
-			progression.playedSinceDailyReset = playedSinceDailyReset;
-			progression.progressionHash = hash;
-			if(hashes[hash]) {
-				d.append(buildProgressBar(progression));
-			} else if(hashes.weeklyMarks[hash]) {
-				if(!playedSinceWeeklyReset) {
-					progression.level = 0;
-				}
-				w.append(buildMarksBar(progression));
-			}
-		});
+		function initializeBoxes() {
+			character.boxes = {};
+			character.boxes.current = {
+				light: {},
+				motes: {},
+				currencies: [],
+				factions: []
+			};
+			character.boxes.weekly = {
+				currencies: {},
+				factions: [],
+				activities: []
+			};
+			character.boxes.daily = {
+				currencies: {},
+				factions: []
+			};
+		}
+		
+		function mapLight() {
+			var bungiePathPrefix = '//bungie.net';
+			character.boxes.current.light = {
+				isHeader: true,
+				title: hashes[character.classHash] + ' ' + character.level,
+				type: 'light',
+				label: playerData.membership.displayName,
+				iconPath: bungiePathPrefix + character.customization.emblemPath,
+				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
+				percentToNextLevel: 0,
+				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
+				progressColor: '#f5dc56',
+				link: 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id + '/#gear'
+			};
+		}
 
-		d.appendTo(characters);
+		function mapMotes() {
+			character.boxes.current.motes = {
+				title: 'Mote of Light',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].progressToNextLevel,
+				max: character.progressions[2030054750].nextLevelAt
+			};
+			character.boxes.weekly.motes = {
+				title: 'Weekly/Lifetime',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].weeklyProgress,
+				max: character.progressions[2030054750].currentProgress
+			};
+			character.boxes.daily.motes = {
+				title: 'Daily/Weekly',
+				type: 'mote-of-light',
+				label: 'Next Mote of Light',
+				progress: character.progressions[2030054750].dailyProgress,
+				max: character.progressions[2030054750].weeklyProgress
+			};
+		}
+		
+		function mapCurrencies() {
+			character.boxes.current.currencies = [];
+			$.each(character.inventory.currencies, function(hash, currency) {
+				character.boxes.current.currencies.push({
+					title: hashes[hash],
+					type: hashes[hash].toLowerCase().replace(/\s/g, '-'),
+					label: hashes[hash],
+					progress: currency.value,
+					max: hashes.caps[hash]
+				});
+			});
+
+			character.boxes.weekly.currencies = {
+				vanguardMarks: {
+					title: 'Weekly',
+					type: 'vanguard-marks',
+					label: 'Weekly Vanguard Marks',
+					progress: character.progressions[2033897742].level,
+					max: hashes.caps[2033897742]
+				},
+				crucibleMarks: {
+					title: 'Weekly',
+					type: 'crucible-marks',
+					label: 'Weekly Crucible Marks',
+					progress: character.progressions[2033897755].level,
+					max: hashes.caps[2033897755]
+				}
+			};
+
+			character.boxes.daily.currencies = {
+				vanguardMarks: {
+					title: 'Daily',
+					type: 'vanguard-marks',
+					label: 'Daily Vanguard Marks',
+					progress: character.progressions[2033897742].dailyProgress,
+					max: hashes.caps[2033897742]
+				},
+				crucibleMarks: {
+					title: 'Daily',
+					type: 'crucible-marks',
+					label: 'Daily Crucible Marks',
+					progress: character.progressions[2033897755].dailyProgress,
+					max: hashes.caps[2033897755]
+				}
+			};
+
+		}
+
+		function mapActivities() {
+
+			var nightfallHash,
+				heroicHash,
+				highestHeroicLevel = 0,
+				heroicProgress = 0,
+				heroicMax = 0;
+
+			$.each(character.activities, function(hash, activity) {
+				if(hashes.weeklyNightfalls[hash]) {
+					nightfallHash = hash;
+				} else if(hashes.weeklyHeroics[hash]){
+					heroicMax += hashes.weeklyHeroics[hash].level;
+					if(!heroicHash) {
+						heroicHash = hash;
+					}
+					if(activity.isCompleted) {
+						heroicProgress += hashes.weeklyHeroics[hash].level;
+						if (hashes.weeklyHeroics[hash].level > highestHeroicLevel) {
+							heroicHash = hash;
+							highestHeroicLevel = hashes.weeklyHeroics[hash].level;
+						}
+					}
+				}
+			});
+
+			character.boxes.weekly.activities = {};
+			if(nightfallHash) {
+				character.boxes.weekly.activities.nightfall = {
+					title: hashes.weeklyNightfalls[nightfallHash],
+					type: 'strike',
+					label: 'Weekly Nightfall',
+					progress: character.activities[nightfallHash].isCompleted? 1 : 0,
+					max: 1,
+					footer: 'Nightfall'
+				};
+			}
+			if(heroicHash) {
+				character.boxes.weekly.activities.heroic = {
+					title: hashes.weeklyHeroics[heroicHash].name,
+					type: 'strike',
+					label: 'Weekly Heroic',
+					progress: heroicProgress,
+					max: heroicMax,
+					footer: 'Heroic Level ' + hashes.weeklyHeroics[heroicHash].level
+				};
+			}
+		}
+
+		function mapFactions() {
+
+			factions = [
+				{hash: 529303302, name: 'Cryptarch'},
+				{hash: 3233510749, name: 'Vanguard'},
+				{hash: 1357277120, name: 'Crucible'},
+				{hash: 2778795080, name: 'Dead Orbit'},
+				{hash: 1424722124, name: 'Future War Cult'},
+				{hash: 3871980777, name: 'New Monarchy'},
+				{hash: 452808717, name: 'Queen'},
+				{hash: 2161005788, name: 'Iron Banner'},
+				{hash: 174528503, name: 'Eris Morn'}
+			];
+
+			$.each(factions, function(i, faction) {
+				var hash = faction.hash;
+				if(!character.progressions[hash]) {
+					return;
+				}
+				var type = faction.name.toLowerCase().replace(/\s/g, '-');
+				character.boxes.current.factions.push({
+					title: 'Rank ' + (character.progressions[hash].level || 0),
+					type: type,
+					label: faction.name,
+					progress: character.progressions[hash].progressToNextLevel,
+					max: character.progressions[hash].nextLevelAt
+				});
+				character.boxes.weekly.factions.push({
+					title: 'Weekly/Lifetime',
+					type: type,
+					label: faction.name,
+					progress: character.progressions[hash].weeklyProgress,
+					max: character.progressions[hash].currentProgress
+				});
+				character.boxes.daily.factions.push({
+					title: 'Daily/Weekly',
+					type: type,
+					label: faction.name,
+					progress: character.progressions[hash].dailyProgress,
+					max: character.progressions[hash].weeklyProgress
+				});
+			});
+		}
+
 	}
 
 	function getDateOfMostRecentDailyReset() {
@@ -228,53 +403,113 @@ $(function() {
 		return date;
 	}
 
-	function showActivityCompletion(div, activities) {
-		var activity = null,
-			heroic = null,
-			nightfall = null,
-			vog = null;
-		if(activities) {
-			$.each(activities, function(hash, activity) {
-				if(activity.isCompleted) {
-					activity = hashes.weeklyHeroics[hash];
-					if((activity && !heroic) || (activity && heroic && activity.level > heroic.level)) {
-						heroic = activity;
-						return;
-					}
-					activity = hashes.weeklyNightfalls[hash];
-					if(activity) {
-						nightfall = activity;
-						return;
-					}
-					activity = hashes.vaultOfGlass[hash];
-					if((activity && !vog) || (activity && vog && activity.level > vog.level)) {
-						vog = activity;
-						return;
-					}
-				}
+	function displayPlayerData() {
+		if(!playerData.characters || !playerData.characters.length) {
+			return;
+		}
+		for(var i=0; i<playerData.characters.length;i++) {
+			displayCharacterData(playerData.characters[i]);
+		}
+	}
+
+	function displayCharacterData(character) {
+		displayCurrentCharacterData();
+		displayWeeklyCharacterData();
+		displayDailyCharacterData();
+
+		function displayCurrentCharacterData() {
+			var tab = tabs.find('.current'),
+				container = $('<div/>').addClass('character-container').appendTo(tab);
+
+			buildBox(character.boxes.current.light).appendTo(container);
+
+			buildBox(character.boxes.current.motes).appendTo(container);
+
+			$.each(character.boxes.current.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.current.factions, function(i, val) {
+				buildBox(val).appendTo(container);
 			});
 		}
-		var heroicCompletionText = 'Weekly Heroic ';
-		if(heroic) {
-			heroicCompletionText += '(' + heroic.level + ') Complete';
-		} else {
-			heroicCompletionText += 'Incomplete';
+
+		function displayWeeklyCharacterData() {
+			var tab = tabs.find('.weekly'),
+				container = $('<div/>').addClass('character-container').appendTo(tab);
+
+			buildBox(character.boxes.current.light).appendTo(container);
+
+			buildBox(character.boxes.weekly.motes).appendTo(container);
+
+			$.each(character.boxes.weekly.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.weekly.activities, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.weekly.factions, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
 		}
-		var nightfallCompletionText = 'Weekly Nightfall ';
-		if(nightfall) {
-			nightfallCompletionText += 'Complete';
-		} else {
-			nightfallCompletionText += 'Incomplete';
+
+		function displayDailyCharacterData() {
+			var tab = tabs.find('.daily'),
+				container = $('<div/>').addClass('character-container').appendTo(tab);
+
+			buildBox(character.boxes.current.light).appendTo(container);
+
+			buildBox(character.boxes.daily.motes).appendTo(container);
+
+			$.each(character.boxes.daily.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.daily.factions, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
 		}
-		var vogCompletionText = 'Vault of Glass ';
-		if(vog) {
-			vogCompletionText += '(' + vog.level + ') Complete';
-		} else {
-			vogCompletionText += 'Incomplete';
+	}
+
+	function buildBox(data) {
+		var box = $('<div/>')
+				.addClass(data.isHeader? 'header-box' : 'progress-box')
+				.addClass(data.type),
+			icon = $('<div/>')
+				.addClass('icon')
+				.prop('title',data.label),
+			progressbar = $('<div/>')
+				.addClass('progress-bar')
+				.height((data.percentToNextLevel || data.progress/data.max*100 || 0) + '%'),
+			amount = $('<div/>')
+				.addClass('amount')
+				.text(data.footer || (data.progress + '/' + data.max)),
+			title = $('<div/>')
+				.addClass('title')
+				.html(data.title);
+
+		if(data.iconPath) {
+			icon.css('background-image', 'url(' + data.iconPath + ')');
 		}
-		div.append($('<span/>').text(heroicCompletionText + ', '))
-			.append($('<span/>').text(nightfallCompletionText))
-			.append($('<div/>').text(vogCompletionText));
+
+		if(data.backgroundPath) {
+			box.css('background-image', 'url(' + data.backgroundPath + ')');
+		}
+
+		if(data.progressColor) {
+			progressbar.css('background-color', data.progressColor);
+		}
+
+		if(data.link) {
+			box.css('cursor','pointer');
+			box.on('click', function() {
+				open(data.link, '_blank');
+			});
+		}
+
+		return box.append(icon, title, amount, progressbar);
 	}
 
 	function showMessage(msg) {
@@ -317,103 +552,6 @@ $(function() {
 		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
 	}
 
-	function buildProgressBar(progressionData) {
-		var adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
-			adjustedWeeklyLabel = 'That Week';
-		if(progressionData.playedSinceWeeklyReset) {
-			adjustedLevel = progressionData.level;
-			adjustedWeeklyLabel = 'This Week';
-		}
-		if(progressionData.playedSinceDailyReset) {
-			adjustedDailyLabel = 'Today';
-		}
-		var container = $('<div/>')
-				.addClass('progress-container'),
-			description = $('<div/>')
-				.addClass('progress-description clearfix'),
-			faction = $('<div/>')
-				.addClass('pull-left')
-				.text(hashes[progressionData.progressionHash]),
-			rank = $('<div/>')
-				.addClass('pull-right')
-				 .text('Rank ' + progressionData.level),
-			progress = $('<div/>')
-				.addClass('progress'),
-			progressbar = $('<div/>')
-				.addClass('progress-bar')
-				.attr('role','progressbar')
-				.attr('aria-valuenow',progressionData.progressToNextLevel)
-				.attr('aria-valuemax',progressionData.nextLevelAt)
-				.attr('aria-valuemin','0')
-				.width(progressionData.progressToNextLevel/progressionData.nextLevelAt*100 + '%')
-				.text(progressionData.progressToNextLevel + '/' + progressionData.nextLevelAt),
-			progressDetails = $('<div/>')
-				.addClass('progress-details')
-				.css('display','none'),
-			progressToday = $('<div/>')
-				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
-				.appendTo(progressDetails),
-			progressThisWeek = $('<div/>')
-				.text(adjustedWeeklyLabel + ': ' + progressionData.weeklyProgress)
-				.appendTo(progressDetails),
-			progressLifetime = $('<div/>')
-				.text('Lifetime: ' + progressionData.currentProgress)
-				.appendTo(progressDetails);
-		container.on('click', function() {
-			progressDetails.toggle();
-			container.toggleClass('progress-container-selected');
-		});
-		progress.append(progressbar);
-		description.append(faction, rank);
-		return container.append(description, progress, progressDetails);
-	}
-
-	function buildMarksBar(progressionData) {
-		var adjustedLevel = 0,
-			adjustedDailyLabel = moment(progressionData.characterDate).format('MMM DD, YYYY'),
-			adjustedWeeklyLabel = 'Week Before';
-		if(progressionData.playedSinceWeeklyReset) {
-			adjustedLevel = progressionData.level;
-			adjustedWeeklyLabel = 'Last Week';
-		}
-		if(progressionData.playedSinceDailyReset) {
-			adjustedDailyLabel = 'Today';
-		}
-		var container = $('<div/>')
-				.addClass('progress-container'),
-			description = $('<div/>')
-				.addClass('progress-description clearfix'),
-			title = $('<div/>')
-				.addClass('pull-left')
-				.text(hashes.weeklyMarks[progressionData.progressionHash]),
-			progress = $('<div/>')
-				.addClass('progress'),
-			progressbar = $('<div/>')
-				.addClass('progress-bar')
-				.attr('role','progressbar')
-				.attr('aria-valuenow',adjustedLevel)
-				.attr('aria-valuemax',100)
-				.attr('aria-valuemin','0')
-				.width(adjustedLevel + '%')
-				.text(adjustedLevel + '/100'),
-			progressDetails = $('<div/>')
-				.addClass('progress-details')
-				.css('display','none'),
-			progressToday = $('<div/>')
-				.text(adjustedDailyLabel + ': ' + progressionData.dailyProgress)
-				.appendTo(progressDetails),
-			progressLastWeek = $('<div/>')
-				.text(adjustedWeeklyLabel + ': ' + Math.abs(adjustedLevel - progressionData.weeklyProgress))
-				.appendTo(progressDetails);
-		container.on('click', function() {
-			progressDetails.toggle();
-			container.toggleClass('progress-container-selected');
-		});
-		progress.append(progressbar);
-		description.append(title);
-		return container.append(description, progress, progressDetails);
-	}
-
 	function updateFormFromHash() {
 		var urlVars = getUrlVars();
 		textInput.val(urlVars.un);
@@ -442,40 +580,50 @@ $(function() {
 		}
 	});
 
-	textInput.focus();
-
-	updateFormFromHash();
-
-	var headerHeight = parseInt($('.header').css('height')),
-		coolStuffDiv = $('.cool-stuff'),
-		aboutDiv = $('.about'),
-		contactDiv = $('.contact'),
-		contributingDiv = $('.contributing');
-
 	function scrollToDiv(div) {
 		var pos = div.offset();
-		pos.top -= headerHeight;
+		pos.top -= parseInt($('.header').css('height'));
 		scrollTo(pos.left, pos.top);
 	}
 
-	$('.search-link').on('click', function() {
-		scrollTo(0,0);
-	});
+	function setupNavigation() {
+		var coolStuffDiv = $('.cool-stuff'),
+		aboutDiv = $('.about'),
+		contactDiv = $('.contact'),
+		contributingDiv = $('.contributing'),
+		navpills = $('.nav-tabs li');
 
-	$('.cool-stuff-link').on('click', function() {
-		scrollToDiv(coolStuffDiv);
-	});
+		$('.search-link').on('click', function() {
+			scrollTo(0,0);
+		});
 
-	$('.about-link').on('click', function() {
-		scrollToDiv(aboutDiv);
-	});
+		$('.cool-stuff-link').on('click', function() {
+			scrollToDiv(coolStuffDiv);
+		});
 
-	$('.contact-link').on('click', function() {
-		scrollToDiv(contactDiv);
-	});
+		$('.about-link').on('click', function() {
+			scrollToDiv(aboutDiv);
+		});
 
-	$('.contributing-link').on('click', function() {
-		scrollToDiv(contributingDiv);
-	});
+		$('.contact-link').on('click', function() {
+			scrollToDiv(contactDiv);
+		});
+
+		$('.contributing-link').on('click', function() {
+			scrollToDiv(contributingDiv);
+		});
+
+		navpills.on('click', function() {
+			var self = $(this);
+			navpills.removeClass('active');
+			self.addClass('active');
+			tabs.find('.tab').hide();
+			tabs.find('.' + self.text().toLowerCase()).show();
+		});
+	}
+
+	textInput.focus();
+	setupNavigation();
+	updateFormFromHash();
 
 });

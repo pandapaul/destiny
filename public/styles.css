@@ -9,6 +9,13 @@ body {
 	color: rgb(222, 222, 222);
 	font-size:18px;
 }
+@media only screen 
+and (min-device-width : 320px) 
+and (max-device-width : 480px) {
+	body {
+		font-size:14px;
+	}
+}
 a {
 	cursor: pointer;
 }
@@ -65,60 +72,179 @@ a {
 }
 .results {
 	text-align: center;
-	margin-top:10px;
+	margin-top:2em;
 }
-.results .characters {
-	margin-top:10px;
+.nav-tabs {
+	margin-top: 0.5em;
+	border: 0px;
 }
-.results .character-container {
-	margin-top:30px;
+.nav-tabs a {
+	border: 0px !important;
 }
-.results .character-link {
-	font-weight:bold;
-	color: rgb(206, 174, 50);
-	margin-right:10px;
+.results .nav li {
+	width: 33.3%;
 }
-.progress-description {
-	padding: 1px;
+.nav li.active a {
+	color: #fff;
+	/*background-color: rgb(78, 50, 99) !important;*/
+	background-color: rgb(206, 174, 50) !important;
 }
-.progress {
-	background-color: rgb(60,60,60);
-	margin-bottom: 3px;
+.nav li.active a:hover {
+	color: #fff;
+	/*background-color: rgb(78, 50, 99) !important;*/
+	background-color: rgb(206, 174, 50) !important;
 }
-.progress-bar {
-	background-color: rgb(93,164,105);
-	color: #222;
-	font-size: 14px;
-	padding-left: 5px;
+.nav li a:hover {
+	color: rgb(222, 222, 222);
+	/*background-color: rgba(78, 50, 99, 0.7) !important;*/
+	background-color: rgba(206, 174, 50, 0.7) !important;
 }
-.progress-details {
-	font-size: 14px;
-	text-align: left;
-	padding-left: 10px;
+.nav li a {
+	color: rgb(222, 222, 222);
+	/*background-color: rgba(78, 50, 99, 0.3) !important;*/
+	background-color: rgba(206, 174, 50, 0.3) !important;
+	border-radius: 0px;
 }
-.progress-container {
-	font-size: 16px;
-	margin-top:10px;
-	max-width: 300px;
-	margin-left:auto;
-	margin-right:auto;
-	cursor: pointer;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-o-user-select: none;
-	user-select: none;
-	border-top-right-radius: 7px;
-	border-bottom-right-radius: 7px;
-	border-top-left-radius: 7px;
-	border-bottom-left-radius: 7px;
-	padding: 3px;
-	border: 1px solid rgba(0,0,0,0);
+.results {
+	display: none;
 }
-.progress-container-selected {
-	border: 1px solid rgb(78, 50, 99);
-	/*background-color: rgb(206, 174, 50);*/
-	background-color: rgba(78, 50, 99, 0.2);
+.tab {
+	display: none;
+	margin-top: 2em;
+}
+.character-container {
+	width: 100%;
+	margin-top: 2em;
+	padding-bottom: 1.5em;
+	background-color: rgba(85, 85, 85, 0.2);
+	border: 1px solid rgba(85, 85, 85, 0.3);
+}
+.header-box {
+	color: #fff;
+	font-size:0.85em;
+    width: 100%;
+    height: 5.525em;
+    background-color: rgb(65,65,65);
+    border: 1px solid rgb(0,0,0);
+    position: relative;
+    margin-bottom: 1em;
+    background-size: 100% 100%;
+}
+.header-box .progress-bar {
+    display:none;
+}
+.header-box .icon {
+	display: inline-block;
+    z-index:1;
+    width:5.4em;
+    height:5.4em;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    float:left;
+}
+.header-box .title {
+	position: absolute;
+	right:0.5em;
+	font-size:1.5em;
+	font-weight: bold;
+    z-index:1;
+}
+.header-box .amount {
+	position: absolute;
+	right:0.5em;
+	bottom:0;
+    z-index:1;
+}
+.progress-box {
+	display: inline-block;
+    font-size:0.85em;
+    width: 8.5em;
+    height: 8.5em;
+    background-color: rgb(65,65,65);
+    border: 1px solid rgb(0,0,0);
+    position: relative;
+    margin: 0.25em;
+}
+.progress-box .progress-bar {
+    position: absolute;
+    z-index:0;
+    bottom: 0;
+    width: 100%;
+    background-color: rgba(93,164,105,0.5);
+}
+.progress-box .icon {
+    position: absolute;
+    z-index:1;
+    margin: 17.5%;
+    width:65%;
+    height:65%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.progress-box .title {
+    position: absolute;
+    z-index:1;
+    width:100%;
+    height:1.2em;
+    text-align:center;
+    background-color: rgba(0,0,0,0.3);
+}
+.progress-box .amount {
+    position: absolute;
+    z-index:1;
+    width: 100%;
+    height:1.2em;
+    text-align: center;
+    bottom: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mote-of-light .icon {
+	background-image: url('/icons/mote.png');
+}
+.glimmer .icon {
+	background-image: url("/icons/glimmer.png");
+}
+.vanguard-marks .icon {
+	background-image: url("/icons/vanguardmark.png");
+}
+.crucible-marks .icon {
+	background-image: url("/icons/cruciblemark.png");
+}
+.crucible .icon {
+    background-image: url("/icons/crucible.png");
+}
+.future-war-cult .icon {
+    background-image: url("/icons/futurewarcult.png");
+}
+.eris-morn .icon {
+    background-image: url("/icons/erismorn.png");
+}
+.queen .icon {
+    background-image: url("/icons/queen.png");
+}
+.cryptarch .icon {
+    background-image: url("/icons/cryptarch.png");
+}
+.iron-banner .icon {
+    background-image: url("/icons/ironbanner.png");
+}
+.dead-orbit .icon {
+    background-image: url("/icons/deadorbit.png");
+}
+.vanguard .icon {
+    background-image: url("/icons/vanguard.png");
+}
+.new-monarchy .icon {
+    background-image: url("/icons/newmonarchy.png");
+}
+.raid .icon {
+	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon7e65328ef867884c68f030903522ce00.png");
+}
+.strike .icon {
+	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon0078e439219debdc0c89724ecdba29cc.png");
 }
 .google-play-link {
 	margin-top:-2px;
