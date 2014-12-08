@@ -3,11 +3,12 @@ Destiny Reputation Search
 
 Description
 -------------
-Destiny Search requires only two things: a username and an account type. It then connects to Bungie.net through a series of service endpoints to retrieve various pieces of publicly available character data. The result is a clean, concise view of a player's Destiny characters.
+This project was the starting point for DestinyRep.com. At this point, both the server and front-end have been completely rewritten, but the core ideas are still the same. Connect to Bungie.net's API, gather character data starting with just a simple username search, & display it in a clear, simple fashion. 
 
-+ [destinyrep.com](http://www.destinyrep.com/) is based on this project
-+ And so is the Android variant: [Google Play Store](https://play.google.com/store/apps/details?id=com.jpapps.repsearch)
-
+Related (& Awesome) Projects
+----------------------------
+* https://github.com/SargoDarya/bungie-platform - If you need to know what end points Bungie offers, this is where you should look.
+* https://github.com/waltfy/destiny/ - A terrific node project for interacting with the Bungie.net API. Anyone developing along these lines should consider contributing to this codebase.
 
 Install & Run
 -------------
