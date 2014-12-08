@@ -2,7 +2,6 @@ $(function() {
 	var button = $('#submitButton'),
 		textInput = $('#textInput'),
 		results = $('.results'),
-		characters = results.find('.characters'),
 		tabs = results.find('.tabs'),
 		message = $('.message'),
 		selectedAccountType = 2,
@@ -79,7 +78,9 @@ $(function() {
 				2033897755: 100
 			},
 		},
-		playerData = {};
+		playerData = {},
+		userPrefs = {},
+		progressStyleOptions = ['progress-box','progress-horizontal'];
 
 	function getUrlVars()
 	{
@@ -120,7 +121,6 @@ $(function() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
 		results.hide();
-		tabs.find('.tab').empty();
 	}
 
 	function stopLoading(err) {
@@ -404,6 +404,7 @@ $(function() {
 	}
 
 	function displayPlayerData() {
+		tabs.find('.tab').empty();
 		if(!playerData.characters || !playerData.characters.length) {
 			return;
 		}
@@ -494,7 +495,7 @@ $(function() {
 
 	function buildBox(data) {
 		var box = $('<div/>')
-				.addClass(data.isHeader? 'header-box' : 'progress-box')
+				.addClass(data.isHeader? 'header-box' : userPrefs.progressType)
 				.addClass(data.type)
 				.prop('title',data.label),
 			icon = $('<div/>')
@@ -587,8 +588,6 @@ $(function() {
 		}
 		if(urlVars.un && urlVars.t) {
 			performSearch();
-		} else {
-			characters.empty();
 		}
 	}
 
@@ -648,8 +647,26 @@ $(function() {
 		});
 	}
 
+	function loadUserPrefs() {
+		var defaultPrefs = {
+			progressType: 'progress-box'
+		};
+		userPrefs = JSON.parse(localStorage.getItem('userPrefs')) || defaultPrefs;
+	}
+
+	function storeUserPrefs() {
+		localStorage.setItem('userPrefs', JSON.stringify(userPrefs));
+	}
+
+	$('.change-style').on('click', function() {
+		userPrefs.progressType = progressStyleOptions[progressStyleOptions.indexOf(userPrefs.progressType) + 1] || progressStyleOptions[0];
+		displayPlayerData();
+		storeUserPrefs();
+	});
+
 	textInput.focus();
 	setupNavigation();
+	loadUserPrefs();
 	updateFormFromHash();
 
 });
