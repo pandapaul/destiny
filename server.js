@@ -183,6 +183,7 @@ function Searcher(username, membershipType) {
 	function getDetailsResultHandler(characterIndex) {
 		var character = self.result.characters[characterIndex];
 		return function(details) {
+			character.definitions = details.definitions;
 			character.inventory = details.inventory;
 			character.activities = details.activities;
 			character.progressions = details.progressions;
@@ -260,12 +261,19 @@ function CharacterDetailsFetcher(characterUrl) {
 	function handleActivitiesResponse(error, response, body) {
 		if(bungieResponseIsValid(error, body) && body.Response.data && body.Response.data.available) {
 			self.result.activities = {};
+			self.result.definitions = {};
 			var activities = body.Response.data.available,
 				definitions = body.Response.definitions;
 			for(var i=0; i < activities.length; i++) {
-				if(bungieStuff.activityTypes[definitions.activities[activities[i].activityHash].activityTypeHash]) {
+				var definition = definitions.activities[activities[i].activityHash];
+				if(bungieStuff.activityTypes[definition.activityTypeHash]) {
 					self.result.activities[activities[i].activityHash] = {
 						isCompleted: activities[i].isCompleted
+					};
+					self.result.definitions[activities[i].activityHash] = {
+						activityName: definition.activityName,
+						activityLevel: definition.activityLevel,
+						activityTypeHash: definition.activityTypeHash
 					};
 				}
 			}
@@ -348,6 +356,7 @@ function Stasher(data) {
 	function upsertCharacter(character) {
 		character.membership = self.data.membership;
 		delete character.customization;
+		delete character.definitions;
 		character.updated = new Date();
 		var condition = {
 			'id': character.id,

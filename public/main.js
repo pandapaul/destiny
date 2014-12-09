@@ -78,6 +78,10 @@ $(function() {
 				2033897742: 100,
 				2033897755: 100
 			},
+			activityTypes: {
+				575572995: 'strike',
+				2043403989: 'raid'
+			}
 		},
 		playerData = {};
 
@@ -292,7 +296,12 @@ $(function() {
 				heroicMax = 0,
 				highestVogLevel = 0,
 				vogProgress = 0,
-				vogMax = 0;
+				vogMax = 0, 
+				crota = {
+					highestLevel: 0,
+					progress: 0,
+					max: 0
+				};
 
 			$.each(character.activities, function(hash, activity) {
 				if(hashes.weeklyNightfalls[hash]) {
@@ -321,6 +330,18 @@ $(function() {
 							highestVogLevel = hashes.vaultOfGlass[hash].level;
 						}
 					}
+				} else if(character.definitions[hash] && hashes.activityTypes[character.definitions[hash].activityTypeHash] === 'raid'){
+					crota.max += character.definitions[hash].activityLevel;
+					if(!crota.hash) {
+						crota.hash = hash;
+					}
+					if(activity.isCompleted) {
+						crota.progress += character.definitions[hash].activityLevel;
+						if(character.definitions[hash].activityLevel > crota.highestLevel) {
+							crota.hash = hash;
+							crota.highestLevel = character.definitions[hash].activityLevel;
+						}
+					}
 				}
 			});
 
@@ -343,6 +364,25 @@ $(function() {
 					progress: heroicProgress,
 					max: heroicMax,
 					footer: 'Heroic Level ' + hashes.weeklyHeroics[heroicHash].level
+				};
+			}
+			if(crota.hash) {
+				character.boxes.current.activities.crota = {
+					title: 'Crota\'s End',
+					type: 'raid',
+					label: 'Lifetime Raid Completion',
+					progress: crota.progress,
+					max: crota.max,
+					footer: 'Raid Level ' + crota.highestLevel
+				};
+			} else {
+				character.boxes.current.activities.crota = {
+					title: 'Crota\'s End',
+					type: 'raid',
+					label: 'Lifetime Raid Completion',
+					progress: 0,
+					max: 1,
+					footer: 'Raid Level 28'
 				};
 			}
 			if(vogHash) {
@@ -465,11 +505,11 @@ $(function() {
 				buildBox(val).appendTo(container);
 			});
 
-			$.each(character.boxes.current.activities, function(i, val) {
+			$.each(character.boxes.current.factions, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
 
-			$.each(character.boxes.current.factions, function(i, val) {
+			$.each(character.boxes.current.activities, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
 		}
