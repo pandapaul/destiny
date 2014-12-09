@@ -61,11 +61,11 @@ function search(req, res) {
 	}
 
 	try {
-		var searcher = new Searcher(req.body.username, req.body.membershipType);
+		var searcher = new Searcher(req.body.username, req.body.membershipType, req.body.justChecking);
 		searcher.search();
 		searcher.finished(function(searchResult) {
 			res.json(searchResult);
-			if(!searchResult.error) {
+			if(!searchResult.error && !req.body.justChecking) {
 				new Stasher(searchResult).stash();
 			}
 		});
@@ -75,7 +75,7 @@ function search(req, res) {
 	}
 }
 
-function Searcher(username, membershipType) {
+function Searcher(username, membershipType, justChecking) {
 	var self = this;
 	self.username = username;
 	self.membershipType = membershipType;
@@ -99,6 +99,10 @@ function Searcher(username, membershipType) {
 		if(bungieResponded(error, body)) {
 			if(body.Response.length < 1) {
 				self.result.error = 'no matches found';
+				self.result.found = false;
+				finish();
+			} else if(justChecking) {
+				self.result.found = true;
 				finish();
 			} else {
 				self.response = body.Response[0];
