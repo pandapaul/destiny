@@ -23,7 +23,7 @@ $(function() {
 				2033897742: 'Vanguard Marks',
 				2033897755: 'Crucible Marks'
 			},
-			weeklyHeroics: {
+			activities: {
 				2591274210: {name: "The Devil's Lair", level: 22},
 				1178608439: {name: "The Summoning Pits", level: 22},
 				1100096652: {name: "The Nexus", level: 22},
@@ -53,21 +53,17 @@ $(function() {
 				1748464682: {name: "The Summoning Pits", level: 28},
 				3815863575: {name: "The Nexus", level: 28},
 				3037962952: {name: "Cerberus Vae III", level: 28},
-				670913373: {name: "Winter's Run", level: 28}
-			},
-			weeklyNightfalls: {
-				2591274209: "The Devil's Lair",
-				1178608436: "The Summoning Pits",
-				1100096655: "The Nexus",
-				3304208794: "Cerberus Vae III",
-				2495639389: "Winter's Run",
-				906746304: "The Devil's Lair",
-				1748464683: "The Summoning Pits",
-				3815863574: "The Nexus",
-				3037962953: "Cerberus Vae III",
-				670913372: "Winter's Run"
-			},
-			vaultOfGlass: {
+				670913373: {name: "Winter's Run", level: 28},
+				2591274209: {name: "The Devil's Lair", level: 28},
+				1178608436: {name: "The Summoning Pits", level: 28},
+				1100096655: {name: "The Nexus", level: 28},
+				3304208794: {name: "Cerberus Vae III", level: 28},
+				2495639389: {name: "Winter's Run", level: 28},
+				906746304: {name: "The Devil's Lair", level: 28},
+				1748464683: {name: "The Summoning Pits", level: 28},
+				3815863574: {name: "The Nexus", level: 28},
+				3037962953: {name: "Cerberus Vae III", level: 28},
+				670913372: {name: "Winter's Run", level: 28},
 				2659248071: {name: "Vault of Glass", level: 26},
 				2659248068: {name: "Vault of Glass", level: 30}
 			},
@@ -185,7 +181,7 @@ $(function() {
 				motes: {},
 				currencies: [],
 				factions: [],
-				activities: {}
+				activities: []
 			};
 			character.boxes.weekly = {
 				currencies: {},
@@ -288,113 +284,69 @@ $(function() {
 
 		function mapActivities() {
 
-			var nightfallHash,
-				heroicHash,
-				vogHash,
-				highestHeroicLevel = 0,
-				heroicProgress = 0,
-				heroicMax = 0,
-				highestVogLevel = 0,
-				vogProgress = 0,
-				vogMax = 0, 
-				crota = {
-					highestLevel: 0,
-					progress: 0,
-					max: 0
-				};
+			var activities = {};
 
 			$.each(character.activities, function(hash, activity) {
-				if(hashes.weeklyNightfalls[hash]) {
-					nightfallHash = hash;
-				} else if(hashes.weeklyHeroics[hash]){
-					heroicMax += hashes.weeklyHeroics[hash].level;
-					if(!heroicHash) {
-						heroicHash = hash;
-					}
-					if(activity.isCompleted) {
-						heroicProgress += hashes.weeklyHeroics[hash].level;
-						if(hashes.weeklyHeroics[hash].level > highestHeroicLevel) {
-							heroicHash = hash;
-							highestHeroicLevel = hashes.weeklyHeroics[hash].level;
-						}
-					}
-				} else if(hashes.vaultOfGlass[hash]) {
-					vogMax += hashes.vaultOfGlass[hash].level;
-					if(!vogHash) {
-						vogHash = hash;
-					}
-					if(activity.isCompleted) {
-						vogProgress += hashes.vaultOfGlass[hash].level;
-						if(hashes.vaultOfGlass[hash].level > highestVogLevel) {
-							vogHash = hash;
-							highestVogLevel = hashes.vaultOfGlass[hash].level;
-						}
-					}
-				} else if(character.definitions[hash] && hashes.activityTypes[character.definitions[hash].activityTypeHash] === 'raid'){
-					crota.max += character.definitions[hash].activityLevel;
-					if(!crota.hash) {
-						crota.hash = hash;
-					}
-					if(activity.isCompleted) {
-						crota.progress += character.definitions[hash].activityLevel;
-						if(character.definitions[hash].activityLevel > crota.highestLevel) {
-							crota.hash = hash;
-							crota.highestLevel = character.definitions[hash].activityLevel;
-						}
+				var definition = character.definitions[hash];
+				var activityProgression = activities[definition.activityName] || {
+					hash: hash,
+					highestLevelCompleted: 0,
+					progress: 0,
+					maxProgress: 0,
+					lowestLevel: definition.activityLevel
+				};
+
+				activityProgression.lowestLevel = Math.min(activityProgression.lowestLevel, definition.activityLevel);
+				activityProgression.name = activityProgression.name || hashes.activities[hash].name || definition.activityName;
+				activityProgression.type = activityProgression.type || getActivityType(hash);
+
+				activityProgression.maxProgress += definition.activityLevel;
+				if(activity.isCompleted) {
+					activityProgression.progress += definition.activityLevel;
+					if(definition.activityLevel > activityProgression.highestLevelCompleted) {
+						activityProgression.hash = hash;
+						activityProgression.highestLevelCompleted = definition.activityLevel;
 					}
 				}
+
+				activities[definition.activityName] = activityProgression;
 			});
 
-			character.boxes.weekly.activities = {};
-			if(nightfallHash) {
-				character.boxes.weekly.activities.nightfall = {
-					title: hashes.weeklyNightfalls[nightfallHash],
-					type: 'strike',
-					label: 'Weekly Nightfall',
-					progress: character.activities[nightfallHash].isCompleted? 1 : 0,
-					max: 1,
-					footer: 'Nightfall'
-				};
+			function getActivityType(hash) {
+				var name = character.definitions[hash].activityName.toLowerCase();
+				if(name.indexOf('nightfall') > -1) {
+					return 'nightfall';
+				}
+				if(name.indexOf('weekly heroic') > -1) {
+					return 'weekly-heroic';
+				}
+				return 'raid';
 			}
-			if(heroicHash) {
-				character.boxes.weekly.activities.heroic = {
-					title: hashes.weeklyHeroics[heroicHash].name,
-					type: 'strike',
-					label: 'Weekly Heroic',
-					progress: heroicProgress,
-					max: heroicMax,
-					footer: 'Heroic Level ' + hashes.weeklyHeroics[heroicHash].level
+
+			$.each(activities, function(i, val) {
+				var box = {
+					title: val.name,
+					type: val.type,
+					progress: val.progress,
+					max: val.maxProgress
 				};
-			}
-			if(crota.hash) {
-				character.boxes.current.activities.crota = {
-					title: 'Crota\'s End',
-					type: 'raid',
-					label: 'Lifetime Raid Completion',
-					progress: crota.progress,
-					max: crota.max,
-					footer: 'Raid Level ' + crota.highestLevel
-				};
-			} else {
-				character.boxes.current.activities.crota = {
-					title: 'Crota\'s End',
-					type: 'raid',
-					label: 'Lifetime Raid Completion',
-					progress: 0,
-					max: 1,
-					footer: 'Raid Level 28'
-				};
-			}
-			if(vogHash) {
-				character.boxes.current.activities.vaultOfGlass = {
-					title: hashes.vaultOfGlass[vogHash].name,
-					type: 'raid',
-					label: 'Lifetime Raid Completion',
-					progress: vogProgress,
-					max: vogMax,
-					footer: 'Raid Level ' + hashes.vaultOfGlass[vogHash].level
-				};
-			}
+				var level = val.highestLevelCompleted || val.lowestLevel;
+
+				if(val.type === 'raid') {
+					box.label = 'Lifetime Raid Completion';
+					box.footer = 'Raid Level ' + level;
+					character.boxes.current.activities.push(box);
+				} else {
+					box.label = 'Weekly Strike';
+					if(val.type === 'nightfall') {
+						box.footer = 'Nightfall Level ' + level;
+					} else {
+						box.footer = 'Heroic Level ' + level;
+					}
+					character.boxes.weekly.activities.push(box);
+				}
+			});
+			
 		}
 
 		function mapFactions() {
