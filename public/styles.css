@@ -16,6 +16,11 @@ and (max-device-width : 480px) {
 		font-size:14px;
 	}
 }
+
+.change-style-div {
+	height: 0.5em;
+}
+
 a {
 	cursor: pointer;
 }
@@ -225,6 +230,7 @@ a {
     border: 1px solid rgb(0,0,0);
     position: relative;
     margin: 0.25em auto;
+    overflow: hidden;
 }
 .progress-horizontal .progress-bar-container {
 	position: absolute;
@@ -232,7 +238,7 @@ a {
 	bottom: 0.2em;
 	left: 5.0em;
 	height: 1.25em;
-	width: 24.4em;
+	width: 81.33%;
 	background-color: rgba(85,85,85,1);
 }
 .progress-bar-container .progress-bar {
