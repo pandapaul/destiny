@@ -18,7 +18,8 @@ function initializeBungieStuff() {
 	bungieStuff.activityTypeNightfall = 575572995;
 	bungieStuff.activityTypes = {
 		575572995: 'Nightfall/WeeklyHeroic',
-		2043403989: 'Raid'
+		2043403989: 'VaultOfGlass',
+		837773392: 'CrotasEnd'
 	};
 	bungieStuff.progressions = {
 		3871980777: 'New Monarchy',
