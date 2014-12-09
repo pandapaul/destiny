@@ -382,8 +382,3 @@ a {
 	background-color: rgba(93,164,105,0.5);
 	border: 1px solid rgb(0,0,0);
 }
-.change-style:focus {
-	background-color: rgba(85, 85, 85, 0.2);
-	border: 1px solid rgba(85, 85, 85, 0.3);
-	color: rgb(222, 222, 222);
-};
