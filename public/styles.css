@@ -330,6 +330,7 @@ a {
 	font-family: monospace;
 	background-color: #f5f5f5;
 	font-size: 0.9em;
+	padding-left: 0.5em;
 }
 .input-with-button {
 	width:100%;
