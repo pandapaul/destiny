@@ -170,7 +170,7 @@ function Searcher(username, membershipType, justChecking) {
 			character.dateLastPlayed = resCharacter.characterBase.dateLastPlayed;
 			character.minutesPlayedThisSession = resCharacter.characterBase.minutesPlayedThisSession;
 			character.minutesPlayedTotal = resCharacter.characterBase.minutesPlayedTotal;
-			character.level = resCharacter.characterBase.powerLevel;
+			character.level = resCharacter.characterLevel;
 			character.raceHash = resCharacter.characterBase.raceHash;
 			character.genderHash = resCharacter.characterBase.genderHash;
 			character.classHash = resCharacter.characterBase.classHash;
