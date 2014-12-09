@@ -204,6 +204,8 @@ a {
     height:1.2em;
     text-align:center;
     background-color: rgba(0,0,0,0.3);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .progress-box .amount {
     position: absolute;
@@ -304,7 +306,10 @@ a {
 .raid .icon {
 	background-image: url("/icons/raid.png");
 }
-.strike .icon {
+.nightfall .icon {
+	background-image: url("/icons/strike.png");
+}
+.weekly-heroic .icon {
 	background-image: url("/icons/strike.png");
 }
 .google-play-link {
