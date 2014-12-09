@@ -60,7 +60,6 @@ function listen() {
 }
 
 function search(req, res) {
-	console.log('origin = ',req.headers.origin);
 	if(!req.body.username) {
 		res.json({error:'missing username'});
 		return;
@@ -70,7 +69,7 @@ function search(req, res) {
 		return;
 	}
 
-	if(req.hostname !== 'localhost' && req.hostname !== 'www.destinyrep.com') {
+	if(req.headers.origin.indexOf('http://localhost:') < 0 && req.headers.origin !== 'http://www.destinyrep.com') {
 		req.body.justChecking = true;
 	}
 
