@@ -38,10 +38,19 @@ function initializeBungieStuff() {
 }
 
 function setupRoutesAndMiddleware() {
+	app.get('/', redirectIfNeeded);
 	app.use(express.static('public'));
 	app.use(bodyParser.json());
 	app.post('/search', search);
 	app.post('/leaderboard', leaderboard);
+}
+
+function redirectIfNeeded(req, res, next) {
+	if(req.header('host').indexOf('herokuapp.com') > -1) {
+		res.redirect(301, 'http://www.destinyrep.com');
+	} else {
+		next();
+	}
 }
 
 function listen() {
@@ -58,6 +67,10 @@ function search(req, res) {
 	if(!req.body.membershipType) {
 		res.json({error:'missing membershipType'});
 		return;
+	}
+
+	if(req.hostname !== 'localhost' && req.hostname !== 'www.destinyrep.com') {
+		req.body.justChecking = true;
 	}
 
 	try {
