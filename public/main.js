@@ -180,7 +180,8 @@ $(function() {
 				light: {},
 				motes: {},
 				currencies: [],
-				factions: []
+				factions: [],
+				activities: {}
 			};
 			character.boxes.weekly = {
 				currencies: {},
@@ -285,9 +286,13 @@ $(function() {
 
 			var nightfallHash,
 				heroicHash,
+				vogHash,
 				highestHeroicLevel = 0,
 				heroicProgress = 0,
-				heroicMax = 0;
+				heroicMax = 0,
+				highestVogLevel = 0,
+				vogProgress = 0,
+				vogMax = 0;
 
 			$.each(character.activities, function(hash, activity) {
 				if(hashes.weeklyNightfalls[hash]) {
@@ -299,9 +304,21 @@ $(function() {
 					}
 					if(activity.isCompleted) {
 						heroicProgress += hashes.weeklyHeroics[hash].level;
-						if (hashes.weeklyHeroics[hash].level > highestHeroicLevel) {
+						if(hashes.weeklyHeroics[hash].level > highestHeroicLevel) {
 							heroicHash = hash;
 							highestHeroicLevel = hashes.weeklyHeroics[hash].level;
+						}
+					}
+				} else if(hashes.vaultOfGlass[hash]) {
+					vogMax += hashes.vaultOfGlass[hash].level;
+					if(!vogHash) {
+						vogHash = hash;
+					}
+					if(activity.isCompleted) {
+						vogProgress += hashes.vaultOfGlass[hash].level;
+						if(hashes.vaultOfGlass[hash].level > highestVogLevel) {
+							vogHash = hash;
+							highestVogLevel = hashes.vaultOfGlass[hash].level;
 						}
 					}
 				}
@@ -326,6 +343,16 @@ $(function() {
 					progress: heroicProgress,
 					max: heroicMax,
 					footer: 'Heroic Level ' + hashes.weeklyHeroics[heroicHash].level
+				};
+			}
+			if(vogHash) {
+				character.boxes.current.activities.vaultOfGlass = {
+					title: hashes.vaultOfGlass[vogHash].name,
+					type: 'raid',
+					label: 'Lifetime Raid Completion',
+					progress: vogProgress,
+					max: vogMax,
+					footer: 'Raid Level ' + hashes.vaultOfGlass[vogHash].level
 				};
 			}
 		}
@@ -436,6 +463,10 @@ $(function() {
 			buildBox(character.boxes.current.motes).appendTo(container);
 
 			$.each(character.boxes.current.currencies, function(i, val) {
+				buildBox(val).appendTo(container);
+			});
+
+			$.each(character.boxes.current.activities, function(i, val) {
 				buildBox(val).appendTo(container);
 			});
 

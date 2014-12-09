@@ -302,10 +302,10 @@ a {
     background-image: url("/icons/newmonarchy.png");
 }
 .raid .icon {
-	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon7e65328ef867884c68f030903522ce00.png");
+	background-image: url("/icons/raid.png");
 }
 .strike .icon {
-	background-image: url("http://www.bungie.net/common/destiny_content/icons/icon0078e439219debdc0c89724ecdba29cc.png");
+	background-image: url("/icons/strike.png");
 }
 .google-play-link {
 	margin-top:-2px;
