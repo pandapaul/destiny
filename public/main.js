@@ -297,7 +297,7 @@ $(function() {
 				};
 
 				activityProgression.lowestLevel = Math.min(activityProgression.lowestLevel, definition.activityLevel);
-				activityProgression.name = activityProgression.name || hashes.activities[hash].name || definition.activityName;
+				activityProgression.name = activityProgression.name || (hashes.activities[hash] && hashes.activities[hash].name) || definition.activityName;
 				activityProgression.type = activityProgression.type || getActivityType(hash);
 
 				activityProgression.maxProgress += definition.activityLevel;
