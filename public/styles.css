@@ -219,26 +219,34 @@ a {
 }
 .progress-horizontal {
 	font-size:0.85em;
-    width: 100%;
-    height: 3em;
+    height: 4em;
+    max-width: 30em;
     background-color: rgb(65,65,65);
     border: 1px solid rgb(0,0,0);
     position: relative;
-    margin: 0.25em;
+    margin: 0.25em auto;
 }
-.progress-horizontal .progress-bar {
+.progress-horizontal .progress-bar-container {
+	position: absolute;
+	z-index: 0;
+	bottom: 0.2em;
+	left: 5.0em;
+	height: 1.25em;
+	width: 24.4em;
+	background-color: rgba(85,85,85,1);
+}
+.progress-bar-container .progress-bar {
     position: absolute;
-    z-index:0;
-    bottom: 0;
-    left: 3em;
-    height: 1.5em;
+    z-index:1;
+    left: 0;
+    height: 100%;
     background-color: rgba(93,164,105,0.5);
 }
 .progress-horizontal .icon {
     position: absolute;
     z-index:1;
-    top:0;
-    left:0;
+    top:0.5em;
+    left:0.5em;
     width:3em;
     height:3em;
     background-size: contain;
@@ -248,21 +256,17 @@ a {
 .progress-horizontal .title {
     position: absolute;
     z-index:1;
-    top:0;
-    right:0;
-    height:1.5em;
-    background-color: rgba(0,0,0,0.3);
+    height:1.2em;
+    text-align: center;
+    left: 5em;
+    top: 0.1em;
 }
 .progress-horizontal .amount {
     position: absolute;
     z-index:1;
-    width: 100%;
-    height:1.2em;
-    text-align: center;
-    left: 3em;
-    bottom: 0.05em;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    top:0.1em;
+    right:0.5em;
+    height:1.5em;
 }
 .mote-of-light .icon {
 	background-image: url('/icons/mote.png');
@@ -362,8 +366,7 @@ a {
 	padding:0;
 }
 .change-style {
-	margin-top: 0.5em;
-	background-color: rgb(65,65,65);
+	margin-top: 1em;
 	background-color: rgba(85, 85, 85, 0.2);
 	border: 1px solid rgba(85, 85, 85, 0.3);
 	color: rgb(222, 222, 222);
@@ -372,3 +375,8 @@ a {
 	background-color: rgba(93,164,105,0.5);
 	border: 1px solid rgb(0,0,0);
 }
+.change-style:focus {
+	background-color: rgba(85, 85, 85, 0.2);
+	border: 1px solid rgba(85, 85, 85, 0.3);
+	color: rgb(222, 222, 222);
+};

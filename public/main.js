@@ -524,14 +524,22 @@ $(function() {
 			icon = $('<div/>')
 				.addClass('icon'),
 			progressbar = $('<div/>')
-				.addClass('progress-bar')
-				.height((data.percentToNextLevel || data.progress/data.max*100 || 0) + '%'),
+				.addClass('progress-bar'),
 			amount = $('<div/>')
 				.addClass('amount')
 				.text(data.footer || (data.progress + '/' + data.max)),
 			title = $('<div/>')
 				.addClass('title')
 				.html(data.title);
+
+		var progressBarSize = (data.percentToNextLevel || data.progress/data.max*100 || 0) + '%';
+
+		if(userPrefs.progressType === 'progress-box') {
+			progressbar.height(progressBarSize);
+		} else if(userPrefs.progressType === 'progress-horizontal') {
+			progressbar.width(progressBarSize);
+			progressbar = $('<div/>').addClass('progress-bar-container').append(progressbar);
+		}
 
 		if(data.subtitle) {
 			$('<div/>')
