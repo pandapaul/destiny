@@ -16,11 +16,6 @@ and (max-device-width : 480px) {
 		font-size:14px;
 	}
 }
-
-.change-style-div {
-	height: 0.5em;
-}
-
 a {
 	cursor: pointer;
 }
@@ -77,7 +72,8 @@ a {
 }
 .results {
 	text-align: center;
-	margin-top:2em;
+	margin-top: 2em;
+	display: none;
 }
 .nav-tabs {
 	margin-top: 0.5em;
@@ -109,9 +105,6 @@ a {
 	/*background-color: rgba(78, 50, 99, 0.3) !important;*/
 	background-color: rgba(206, 174, 50, 0.3) !important;
 	border-radius: 0px;
-}
-.results {
-	display: none;
 }
 .tab {
 	display: none;
@@ -381,4 +374,7 @@ a {
 .change-style:hover {
 	background-color: rgba(93,164,105,0.5);
 	border: 1px solid rgb(0,0,0);
+}
+.change-style-div {
+	height: 0.5em;
 }

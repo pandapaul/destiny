@@ -601,16 +601,7 @@ $(function() {
 		showMessage(err);
 	}
 
-	button.on('click', function() {
-		var username = textInput.val().replace(/\s/g, '');
-		textInput.val(username);
-		if(!username) {
-			return;
-		}
-		updateHash();
-	});
-
-	function updateHash() {
+	function updateHashFromForm() {
 		window.location.hash = 'un=' + textInput.val() + '&t=' + selectedAccountType;
 	}
 
@@ -625,6 +616,15 @@ $(function() {
 			performSearch();
 		}
 	}
+
+	button.on('click', function() {
+		var username = textInput.val().replace(/\s/g, '');
+		textInput.val(username);
+		if(!username) {
+			return;
+		}
+		updateHashFromForm();
+	});
 
 	$(window).on('hashchange', function() {
 		updateFormFromHash();
@@ -651,7 +651,7 @@ $(function() {
 		aboutDiv = $('.about'),
 		contactDiv = $('.contact'),
 		contributingDiv = $('.contributing'),
-		navpills = $('.nav-tabs li');
+		navtabs = $('.nav-tabs li');
 
 		$('.search-link').on('click', function() {
 			scrollTo(0,0);
@@ -673,9 +673,9 @@ $(function() {
 			scrollToDiv(contributingDiv);
 		});
 
-		navpills.on('click', function() {
+		navtabs.on('click', function() {
 			var self = $(this);
-			navpills.removeClass('active');
+			navtabs.removeClass('active');
 			self.addClass('active');
 			tabs.find('.tab').hide();
 			tabs.find('.' + self.text().toLowerCase()).show();
