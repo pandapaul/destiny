@@ -69,7 +69,7 @@ function search(req, res) {
 		return;
 	}
 
-	if(req.body.key !== '01242015' && req.headers.origin.indexOf('http://localhost:') < 0 && req.headers.origin !== 'http://www.destinyrep.com') {
+	if(req.body.key !== '01242015' && (req.headers.origin && req.headers.origin.indexOf('http://localhost:')) < 0 && req.headers.origin !== 'http://www.destinyrep.com') {
 		req.body.justChecking = true;
 		console.log('Unknown Origin: ' + req.headers.origin);
 	}
