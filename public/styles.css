@@ -19,6 +19,13 @@ and (max-device-width : 480px) {
 a {
 	cursor: pointer;
 }
+.poll {
+	color: rgb(206, 174, 50);
+	font-size: 0.85em;
+	margin-top: 1em !important;
+	background-color: rgba(85, 85, 85, 0.2);
+	border: 1px solid rgba(85, 85, 85, 0.3);
+}
 .search {
 	min-height:800px;
 	min-height:100vh;
