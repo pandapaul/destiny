@@ -42,6 +42,7 @@ function setupRoutesAndMiddleware() {
 	app.use(express.static('public'));
 	app.use(bodyParser.json());
 	app.post('/search', search);
+	app.post('/doesUserExist', doesUserExist);
 	app.post('/leaderboard', leaderboard);
 }
 
@@ -68,10 +69,9 @@ function search(req, res) {
 		res.json({error:'missing membershipType'});
 		return;
 	}
-
-	if(req.body.key !== '01242015' && (req.headers.origin && req.headers.origin.indexOf('http://localhost:')) < 0 && req.headers.origin !== 'http://www.destinyrep.com') {
+	if(req.body.key !== '01242015') {
 		req.body.justChecking = true;
-		console.log('Unknown Origin: ' + req.headers.origin);
+		console.log('No key provided. Host: ' + req.header('host'));
 	}
 
 	try {
@@ -82,6 +82,30 @@ function search(req, res) {
 			if(!searchResult.error && !req.body.justChecking) {
 				new Stasher(searchResult).stash();
 			}
+		});
+	} catch(err) {
+		console.log('search error', err);
+		res.json({error:'search error. try again in a moment'});
+	}
+}
+
+function doesUserExist(req, res) {
+	if(!req.body.username) {
+		res.json({error:'missing username'});
+		return;
+	}
+	if(!req.body.membershipType) {
+		res.json({error:'missing membershipType'});
+		return;
+	}
+
+	var justChecking = true;
+
+	try {
+		var searcher = new Searcher(req.body.username, req.body.membershipType, justChecking);
+		searcher.search();
+		searcher.finished(function(searchResult) {
+			res.json(searchResult);
 		});
 	} catch(err) {
 		console.log('search error', err);
@@ -112,7 +136,9 @@ function Searcher(username, membershipType, justChecking) {
 	function handleSearchResponse(error, response, body) {
 		if(bungieResponded(error, body)) {
 			if(body.Response.length < 1) {
-				self.result.error = 'no matches found';
+				if(!justChecking) {
+					self.result.error = 'no matches found';
+				}
 				self.result.found = false;
 				finish();
 			} else if(justChecking) {
