@@ -104,7 +104,7 @@ $(function() {
 		$.ajax({
 			url: '/search', 
 			type: 'POST',
-			data: JSON.stringify({username:textInput.val(), membershipType:selectedAccountType}),
+			data: JSON.stringify({username:textInput.val().replace(/\s/g, ''), membershipType:selectedAccountType, key:'01242015'}),
 			contentType:'application/json; charset=utf-8',
 			dataType:'json'
 		}).done(function(res){
