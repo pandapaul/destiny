@@ -372,7 +372,7 @@ $(function() {
 				if(!character.progressions[hash]) {
 					return;
 				}
-				var type = faction.name.toLowerCase().replace(/\s/g, '-');
+				var type = faction.name.toLowerCase().replace(/\s/g, '-').replace(/\'/, '');
 				character.boxes.current.factions.push({
 					title: 'Rank ' + (character.progressions[hash].level || 0),
 					type: type,
