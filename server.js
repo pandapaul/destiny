@@ -30,7 +30,7 @@ function initializeBungieStuff() {
 		1357277120: 'Crucible',
 		2778795080: 'Dead Orbit',
 		1424722124: 'Future War Cult',
-		174528503: 'Eris Morn',
+		174528503: 'Crota\'s Bane',
 		2033897742: 'Weekly Vanguard Marks',
 		2033897755: 'Weekly Crucible Marks',
 		2030054750: 'Mote of Light'
@@ -180,6 +180,7 @@ function Searcher(username, membershipType, justChecking) {
 				emblemPath: resCharacter.emblemPath,
 				backgroundPath: resCharacter.backgroundPath
 			};
+			character.equipment = 
 			characters.push(character);
 		}
 		self.result.characters = characters;

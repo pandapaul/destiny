@@ -364,7 +364,7 @@ $(function() {
 				{hash: 3871980777, name: 'New Monarchy'},
 				{hash: 452808717, name: 'Queen'},
 				{hash: 2161005788, name: 'Iron Banner'},
-				{hash: 174528503, name: 'Eris Morn'}
+				{hash: 174528503, name: 'Crota\'s Bane'}
 			];
 
 			$.each(factions, function(i, faction) {
