@@ -80,7 +80,7 @@ function search(req, res) {
 		searcher.finished(function(searchResult) {
 			res.json(searchResult);
 			if(!searchResult.error && !req.body.justChecking) {
-				new Stasher(searchResult).stash();
+				// new Stasher(searchResult).stash();
 			}
 		});
 	} catch(err) {
@@ -470,11 +470,13 @@ function leaderboard(req, res) {
 	fields[currentProgress] = 1;
 	fields[level] = 1;
 
-	var fetcher = new Fetcher({},{sort:sort, fields:fields});
-	fetcher.fetch();
-	fetcher.finished(function(docs) {
-		res.json(docs);
-	});
+	res.json({error:'the leaderboards are unavailable for a bit while the data gets migrated to a 4x bigger database. searches from the main page will still function normally'});
+
+	// var fetcher = new Fetcher({},{sort:sort, fields:fields});
+	// fetcher.fetch();
+	// fetcher.finished(function(docs) {
+	// 	res.json(docs);
+	// });
 }
 
 function Fetcher(condition, options) {

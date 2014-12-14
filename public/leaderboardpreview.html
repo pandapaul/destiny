@@ -103,9 +103,13 @@
 					contentType:'application/json; charset=utf-8',
 					dataType:'json'
 				}).done(function(res){
-					container.text('');
-					leaderboard = res;
-					showLeaderboard();
+					if(res.error) {
+						container.text(res.error).css('color','#a94442');
+					} else {
+						container.text('');
+						leaderboard = res;
+						showLeaderboard();
+					}
 				}).fail(function(err){
 					container.text('something went wrong. but don\'t worry, this is just the early access version');
 				});
