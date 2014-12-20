@@ -255,6 +255,8 @@ function Searcher(username, membershipType, justChecking) {
 function requestJson(options, callback) {
 	options = options || {};
 	options.json = true;
+	options.headers = options.headers || {};
+	options.headers['X-API-Key'] = '2e5642a8e26b446b85daef14aee56a1a';
 	return request(options, callback);
 }
 
