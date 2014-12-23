@@ -179,7 +179,7 @@ $(function() {
 				percentToNextLevel: 0,
 				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
 				progressColor: '#f5dc56',
-				link: 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id + '/#gear'
+				link: 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id + '#gear'
 			};
 		}
 
