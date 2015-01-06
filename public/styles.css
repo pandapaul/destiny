@@ -47,8 +47,16 @@ a {
 	height:60px;
 	width: 100%;
 	background-color: rgb(78, 50, 99);
-	font-size: 24px;
+	border-bottom: 1px solid rgb(0,0,0);
 	padding-top:4px;
+
+}
+.header .player-name {
+	font-size: 0.68em;
+	margin-top: -0.25em;
+	margin-left: 0.1em;
+	color: rgb(206, 174, 50);
+	font-weight: bold;
 }
 .footer {
 	position: fixed;
@@ -58,13 +66,17 @@ a {
 	height: 40px;
 	background-color: #f5f5f5;
 }
-.header-link {
+.page-title {
+	margin-top: -0.25em;
+	font-size: 1.3em;
+}
+.header a {
 	color: rgb(222, 222, 222);
 	cursor: pointer;
 }
-.header-link:hover {
+.header a:hover {
 	text-decoration: none;
-	color: rgb(222, 222, 222);
+	color: rgb(255, 255, 255);
 }
 .spa-section {
 	padding-bottom:50px;
@@ -322,7 +334,8 @@ a {
 	background-image: url("/icons/strike.png");
 }
 .google-play-link {
-	margin-top:-2px;
+	font-size: 1.3em;
+	margin-top: -0.25em;
 }
 .code {
 	color: rgb(78, 50, 99);

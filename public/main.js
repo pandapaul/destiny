@@ -5,6 +5,7 @@ $(function() {
 		tabs = results.find('.tabs'),
 		message = $('.message'),
 		selectedAccountType = 2,
+		playerName = $('.player-name'),
 		hashes = {
 			3159615086: 'Glimmer',
 			1415355184: 'Crucible Marks',
@@ -124,6 +125,7 @@ $(function() {
 		showMessage({text:'loading...',level:'info'});
 		button.attr('disabled',true);
 		results.hide();
+		playerName.empty();
 	}
 
 	function stopLoading(err) {
@@ -131,6 +133,7 @@ $(function() {
 			showError(err);
 		} else {
 			message.empty();
+			playerName.text(playerData.membership.displayName);
 			scrollToDiv(results);
 		}
 		button.attr('disabled',false);
