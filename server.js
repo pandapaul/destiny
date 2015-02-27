@@ -17,7 +17,8 @@ function initializeBungieStuff() {
 	bungieStuff.url = 'http://www.bungie.net/Platform/Destiny/';
 	bungieStuff.activityTypeNightfall = 575572995;
 	bungieStuff.activityTypes = {
-		575572995: 'Nightfall/WeeklyHeroic',
+		575572995: 'Nightfall',
+		4164571395: 'Weekly Heroic',
 		2043403989: 'VaultOfGlass',
 		837773392: 'CrotasEnd'
 	};
