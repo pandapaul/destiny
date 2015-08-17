@@ -102,7 +102,7 @@ $(function() {
 	function performSearch() {
 		startLoading();
 		$.ajax({
-			url: '/search', 
+			url: '/search',
 			type: 'POST',
 			data: JSON.stringify({username:textInput.val().replace(/\s/g, ''), membershipType:selectedAccountType, key:'01242015'}),
 			contentType:'application/json; charset=utf-8',
@@ -199,7 +199,7 @@ $(function() {
 				factions: []
 			};
 		}
-		
+
 		function mapLight() {
 			var bungiePathPrefix = '//bungie.net';
 			character.boxes.current.light = {
@@ -239,7 +239,7 @@ $(function() {
 				max: character.progressions[2030054750].weeklyProgress
 			};
 		}
-		
+
 		function mapCurrencies() {
 			character.boxes.current.currencies = [];
 			$.each(character.inventory.currencies, function(hash, currency) {
@@ -352,7 +352,7 @@ $(function() {
 					character.boxes.weekly.activities.push(box);
 				}
 			});
-			
+
 		}
 
 		function mapFactions() {
@@ -364,7 +364,8 @@ $(function() {
 				{hash: 2778795080, name: 'Dead Orbit'},
 				{hash: 1424722124, name: 'Future War Cult'},
 				{hash: 3871980777, name: 'New Monarchy'},
-				{hash: 452808717, name: 'Queen'},
+				{hash: 807090922, name: 'Queen\'s Wrath'},
+				{hash: 3641985238, name: 'House of Judgment'},
 				{hash: 2161005788, name: 'Iron Banner'},
 				{hash: 174528503, name: 'Crota\'s Bane'}
 			];

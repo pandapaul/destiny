@@ -26,7 +26,8 @@ function initializeBungieStuff() {
 		3871980777: 'New Monarchy',
 		529303302: 'Cryptarch',
 		2161005788: 'Iron Banner',
-		452808717: 'Queen',
+		807090922: 'Queen\s Wrath',
+		3641985238: 'House of Judgment',
 		3233510749: 'Vanguard',
 		1357277120: 'Crucible',
 		2778795080: 'Dead Orbit',
@@ -207,7 +208,7 @@ function Searcher(username, membershipType, justChecking) {
 				emblemPath: resCharacter.emblemPath,
 				backgroundPath: resCharacter.backgroundPath
 			};
-			character.equipment = 
+			character.equipment =
 			characters.push(character);
 		}
 		self.result.characters = characters;
