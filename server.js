@@ -26,7 +26,7 @@ function initializeBungieStuff() {
 		3871980777: 'New Monarchy',
 		529303302: 'Cryptarch',
 		2161005788: 'Iron Banner',
-		807090922: 'Queen\s Wrath',
+		807090922: 'Queen\'s Wrath',
 		3641985238: 'House of Judgment',
 		3233510749: 'Vanguard',
 		1357277120: 'Crucible',
@@ -173,7 +173,7 @@ function Searcher(username, membershipType, justChecking) {
 	}
 
 	function getCharacters() {
-		var url = bungieStuff.url + self.membershipPlatform + '/Account/' + self.result.membership.id + '/';
+		var url = bungieStuff.url + self.membershipPlatform + '/Account/' + self.result.membership.id + '/Summary';
 		requestJson({url:url}, handleCharactersResponse);
 	}
 
@@ -283,7 +283,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	};
 
 	function getInventory() {
-		var url = self.characterUrl + 'Inventory/';
+		var url = self.characterUrl + 'Inventory/Summary';
 		requestJson({url:url}, handleInventoryResponse);
 	}
 

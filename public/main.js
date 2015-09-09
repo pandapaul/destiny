@@ -8,6 +8,7 @@ $(function() {
 		playerName = $('.player-name'),
 		hashes = {
 			3159615086: 'Glimmer',
+			2534352370: 'Legendary Marks',
 			1415355184: 'Crucible Marks',
 			1415355173: 'Vanguard Marks',
 			898834093: 'Exo',
@@ -75,7 +76,8 @@ $(function() {
 				1415355184: 200,
 				1415355173: 200,
 				2033897742: 100,
-				2033897755: 100
+				2033897755: 100,
+				2534352370: 200
 			},
 			activityTypes: {
 				575572995: 'strike',
@@ -245,7 +247,7 @@ $(function() {
 			$.each(character.inventory.currencies, function(hash, currency) {
 				character.boxes.current.currencies.push({
 					title: hashes[hash],
-					type: hashes[hash].toLowerCase().replace(/\s/g, '-'),
+					type: (hashes[hash] || '').toLowerCase().replace(/\s/g, '-'),
 					label: hashes[hash],
 					progress: currency.value,
 					max: hashes.caps[hash]

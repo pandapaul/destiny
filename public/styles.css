@@ -290,6 +290,9 @@ a {
 .glimmer .icon {
 	background-image: url("/icons/glimmer.png");
 }
+.legendary-marks .icon {
+	background-image: url("/icons/legendarymark.png");
+}
 .vanguard-marks .icon {
 	background-image: url("/icons/vanguardmark.png");
 }
