@@ -361,6 +361,7 @@ $(function() {
 
 			factions = [
 				{hash: 529303302, name: 'Cryptarch'},
+				{hash: 2335631936, name: 'Gunsmith'},
 				{hash: 3233510749, name: 'Vanguard'},
 				{hash: 1357277120, name: 'Crucible'},
 				{hash: 2778795080, name: 'Dead Orbit'},

@@ -284,6 +284,9 @@ a {
     right:0.5em;
     height:1.5em;
 }
+.gunsmith .icon {
+	background-image: url("/icons/gunsmith.png");
+}
 .mote-of-light .icon {
 	background-image: url('/icons/mote.png');
 }
@@ -312,7 +315,7 @@ a {
     background-image: url("/icons/queen.png");
 }
 .house-of-judgment .icon {
-	background-image: url("icons/houseofjudgment.png");
+	background-image: url("/icons/houseofjudgment.png");
 }
 .cryptarch .icon {
     background-image: url("/icons/cryptarch.png");

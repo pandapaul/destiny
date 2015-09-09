@@ -35,7 +35,8 @@ function initializeBungieStuff() {
 		174528503: 'Crota\'s Bane',
 		2033897742: 'Weekly Vanguard Marks',
 		2033897755: 'Weekly Crucible Marks',
-		2030054750: 'Mote of Light'
+		2030054750: 'Mote of Light',
+		2335631936: 'Gunsmith'
 	};
 }
 
