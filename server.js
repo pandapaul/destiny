@@ -193,9 +193,18 @@ function Searcher(username, membershipType, justChecking) {
 
 	function mapResponseToResultCharacters() {
 		var characters = [];
-		for (var i=0; i < self.response.characters.length; i++) {
+		var currencies = self.response.inventory.currencies;
+		var inventory = {
+			currencies: {}
+		};
+		for(var i=0;i<currencies.length;i++) {
+			inventory.currencies[currencies[i].itemHash] = {
+				value: currencies[i].value
+			};
+		}
+		for (var j=0; j < self.response.characters.length; j++) {
 			var character = {},
-				resCharacter = self.response.characters[i];
+				resCharacter = self.response.characters[j];
 			character.id = resCharacter.characterBase.characterId;
 			character.dateLastPlayed = resCharacter.characterBase.dateLastPlayed;
 			character.minutesPlayedThisSession = resCharacter.characterBase.minutesPlayedThisSession;
@@ -209,7 +218,7 @@ function Searcher(username, membershipType, justChecking) {
 				emblemPath: resCharacter.emblemPath,
 				backgroundPath: resCharacter.backgroundPath
 			};
-			character.equipment =
+			character.inventory = inventory;
 			characters.push(character);
 		}
 		self.result.characters = characters;
@@ -233,7 +242,6 @@ function Searcher(username, membershipType, justChecking) {
 		var character = self.result.characters[characterIndex];
 		return function(details) {
 			character.definitions = details.definitions;
-			character.inventory = details.inventory;
 			character.activities = details.activities;
 			character.progressions = details.progressions;
 			self.characterDetailsCompletion.push(true);
@@ -274,7 +282,6 @@ function CharacterDetailsFetcher(characterUrl) {
 	self.result = {};
 
 	self.fetch = function() {
-		getInventory();
 		getActivities();
 		getProgressions();
 	};
@@ -361,7 +368,7 @@ function CharacterDetailsFetcher(characterUrl) {
 	}
 
 	function finishIfComplete() {
-		if(self.completion.inventory && self.completion.activities && self.completion.progressions) {
+		if(self.completion.activities && self.completion.progressions) {
 			finish();
 		}
 	}
