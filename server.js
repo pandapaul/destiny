@@ -3,6 +3,7 @@ var express = require('express'),
 	request = require('request'),
 	mongo = require('mongodb'),
 	app = express(),
+	logBungieResponses = false,
 	bungieStuff = {};
 
 initializeBungieStuff();
@@ -210,6 +211,7 @@ function Searcher(username, membershipType, justChecking) {
 			character.minutesPlayedThisSession = resCharacter.characterBase.minutesPlayedThisSession;
 			character.minutesPlayedTotal = resCharacter.characterBase.minutesPlayedTotal;
 			character.level = resCharacter.characterLevel;
+			character.light = resCharacter.characterBase.powerLevel;
 			character.raceHash = resCharacter.characterBase.raceHash;
 			character.genderHash = resCharacter.characterBase.genderHash;
 			character.classHash = resCharacter.characterBase.classHash;
@@ -268,7 +270,22 @@ function requestJson(options, callback) {
 	options.json = true;
 	options.headers = options.headers || {};
 	options.headers['X-API-Key'] = '2e5642a8e26b446b85daef14aee56a1a';
-	return request(options, callback);
+	return request(options, function (error, response, body) {
+		if (logBungieResponses) {
+			logResponseJson(options, error, response, body);
+		}
+		callback(error, response, body);
+	});
+}
+
+function logResponseJson(options, error, response, body) {
+	console.log('Response from ' + options.url);
+	if (error) {
+		console.log('Error', error);
+	}
+	if (body) {
+		console.log('Body', body);
+	}
 }
 
 function bungieResponseIsValid(error, body) {
