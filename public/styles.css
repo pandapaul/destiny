@@ -167,24 +167,33 @@ a {
     background-position: center;
     float:left;
 }
-.header-box .title {
-	position: absolute;
-	right:0.5em;
-	font-size:1.5em;
-	font-weight: bold;
-    z-index:1;
-}
 .header-box .subtitle {
 	position: absolute;
-	top: 1.75em;
-	right: 0.8em;
+	left: 5.4em;
+   z-index:1;
+	display: none;
+}
+.header-box .title {
+	position: absolute;
+	font-size: 1.5em;
+	right:0.25em;
+	font-weight: bold;
 	z-index: 1;
 }
 .header-box .amount {
 	position: absolute;
-	right:0.5em;
+	right:0.25em;
 	bottom:0;
-    z-index:1;
+	font-size:1.5em;
+	font-weight: bold;
+	color: rgb(245, 220, 86);
+   z-index:1;
+}
+.header-box .amount:before {
+	content: '\2726';
+	display: inline-block;
+	vertical-align: 22%;
+	font-size: 50%;
 }
 .progress-box {
 	display: inline-block;

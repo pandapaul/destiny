@@ -207,12 +207,13 @@ $(function() {
 			character.boxes.current.light = {
 				isHeader: true,
 				title: hashes[character.classHash] + ' ' + character.level,
+				subtitle: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
 				type: 'light',
 				label: 'Click to view on Bungie.net',
 				iconPath: bungiePathPrefix + character.customization.emblemPath,
 				backgroundPath: bungiePathPrefix + character.customization.backgroundPath,
 				percentToNextLevel: 0,
-				footer: hashes[character.genderHash] + ' ' + hashes[character.raceHash],
+				footer: character.light,
 				progressColor: '#f5dc56',
 				link: 'http://www.bungie.net/en/Legend/' + playerData.membership.type + '/' + playerData.membership.id + '/' + character.id + '#gear'
 			};
@@ -405,8 +406,8 @@ $(function() {
 
 	}
 
-	function getDateOfMostRecentDailyReset(dateLastPlayed) {
-		var date = dateLastPlayed? new Date(dateLastPlayed) : new Date();
+	function getDateOfMostRecentDailyReset() {
+		var date = new Date();
 		if(date.getUTCHours() < 9) {
 			date.setUTCDate(date.getUTCDate() - 1);
 		}
