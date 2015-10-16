@@ -199,6 +199,11 @@ function Searcher(username, membershipType, justChecking) {
 			currencies: {}
 		};
 		for(var i=0;i<currencies.length;i++) {
+			//Skip silver for now. TODO
+			if (currencies[i].itemHash === 2749350776) {
+				continue;
+			}
+			
 			inventory.currencies[currencies[i].itemHash] = {
 				value: currencies[i].value
 			};
