@@ -198,15 +198,17 @@ function Searcher(username, membershipType, justChecking) {
 		var inventory = {
 			currencies: {}
 		};
-		for(var i=0;i<currencies.length;i++) {
-			//Skip silver for now. TODO
-			if (currencies[i].itemHash === 2749350776) {
-				continue;
+		if (currencies) {
+			for(var i=0;i<currencies.length;i++) {
+				//Skip silver for now. TODO
+				if (currencies[i].itemHash === 2749350776) {
+					continue;
+				}
+				
+				inventory.currencies[currencies[i].itemHash] = {
+					value: currencies[i].value
+				};
 			}
-			
-			inventory.currencies[currencies[i].itemHash] = {
-				value: currencies[i].value
-			};
 		}
 		for (var j=0; j < self.response.characters.length; j++) {
 			var character = {},
