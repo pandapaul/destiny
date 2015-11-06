@@ -86,18 +86,18 @@ function logCoinsEvent(req, res) {
 
 	try {
 		var dbHandler = new DatabaseConnectionHandler();
-		dbHandler.connect(upsert);
+		dbHandler.connect(insert);
 	} catch(err) {
 		console.log('logCoinsEvent error', err);
 		finish();
 	}
 
-	function upsert(connectionError) {
+	function insert(connectionError) {
 		if(connectionError) {
 			finish();
 			return;
 		}
-		dbHandler.upsert('threeOfCoinsEvents', {}, eventLog, finish);
+		dbHandler.insertOne('threeOfCoinsEvents', eventLog, finish);
 	}
 
 	function finish() {
@@ -521,6 +521,10 @@ function DatabaseConnectionHandler() {
 		if(self.db && self.db.close) {
 			self.db.close();
 		}
+	};
+
+	self.insertOne = function(collection, data, callback) {
+		self.db.collection(collection).insertOne(data, callback);
 	};
 
 	self.upsert = function(collection, condition, data, callback) {
