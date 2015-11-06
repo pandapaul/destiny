@@ -2,6 +2,7 @@ var express = require('express'),
 	bodyParser = require('body-parser'),
 	request = require('request'),
 	mongo = require('mongodb'),
+	uuid = require('uuid'),
 	app = express(),
 	logBungieResponses = false,
 	bungieStuff = {};
@@ -48,6 +49,10 @@ function setupRoutesAndMiddleware() {
 	app.post('/search', search);
 	app.post('/doesUserExist', doesUserExist);
 	app.post('/leaderboard', leaderboard);
+	app.post('/3oc/logEvent', logCoinsEvent);
+	app.get('/3oc', function (req, res) {
+		res.sendFile(__dirname + '/public/3oc.html');
+	});
 }
 
 function redirectIfNeeded(req, res, next) {
@@ -62,6 +67,43 @@ function listen() {
 	var listenPort = process.env.PORT || 5000;
 	app.listen(listenPort);
 	console.log('Listening on port ' + listenPort);
+}
+
+function logCoinsEvent(req, res) {
+	var eventType = req && req.body && req.body.eventType;
+	var sessionId = (req && req.body && req.body.sessionId) || uuid.v4();
+	var timestamp = new Date();
+	var eventLog = {
+		type: eventType,
+		sessionId: sessionId,
+		timestamp: timestamp
+	};
+
+	if (!eventType) {
+		res.json({error: 'missing eventType'});
+		return;
+	}
+
+	try {
+		var dbHandler = new DatabaseConnectionHandler();
+		dbHandler.connect(upsert);
+	} catch(err) {
+		console.log('logCoinsEvent error', err);
+		finish();
+	}
+
+	function upsert(connectionError) {
+		if(connectionError) {
+			finish();
+			return;
+		}
+		dbHandler.upsert('threeOfCoinsEvents', {}, eventLog, finish);
+	}
+
+	function finish() {
+		dbHandler.disconnect();
+		res.json(eventLog);
+	}
 }
 
 function search(req, res) {

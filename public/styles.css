@@ -147,25 +147,25 @@ a {
 .header-box {
 	color: #fff;
 	font-size:0.85em;
-    width: 100%;
-    height: 5.525em;
-    background-color: rgb(65,65,65);
-    border: 1px solid rgb(0,0,0);
-    position: relative;
-    background-size: 100% 100%;
+	width: 100%;
+	height: 5.525em;
+	background-color: rgb(65,65,65);
+	border: 1px solid rgb(0,0,0);
+	position: relative;
+	background-size: 100% 100%;
 }
 .header-box .progress-bar {
-    display:none;
+	display:none;
 }
 .header-box .icon {
 	display: inline-block;
-    z-index:1;
-    width:5.4em;
-    height:5.4em;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    float:left;
+	z-index:1;
+	width:5.4em;
+	height:5.4em;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+	float:left;
 }
 .header-box .subtitle {
 	position: absolute;
@@ -197,59 +197,59 @@ a {
 }
 .progress-box {
 	display: inline-block;
-    font-size:0.85em;
-    width: 8.5em;
-    height: 8.5em;
-    background-color: rgb(65,65,65);
-    border: 1px solid rgb(0,0,0);
-    position: relative;
-    margin: 0.25em;
+	font-size:0.85em;
+	width: 8.5em;
+	height: 8.5em;
+	background-color: rgb(65,65,65);
+	border: 1px solid rgb(0,0,0);
+	position: relative;
+	margin: 0.25em;
 }
 .progress-box .progress-bar {
-    position: absolute;
-    z-index:0;
-    bottom: 0;
-    width: 100%;
-    background-color: rgba(93,164,105,0.5);
+	position: absolute;
+	z-index:0;
+	bottom: 0;
+	width: 100%;
+	background-color: rgba(93,164,105,0.5);
 }
 .progress-box .icon {
-    position: absolute;
-    z-index:1;
-    margin: 17.5%;
-    width:65%;
-    height:65%;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+	position: absolute;
+	z-index:1;
+	margin: 17.5%;
+	width:65%;
+	height:65%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 .progress-box .title {
-    position: absolute;
-    z-index:1;
-    width:100%;
-    height:1.2em;
-    text-align:center;
-    background-color: rgba(0,0,0,0.3);
-    text-overflow: ellipsis;
+	position: absolute;
+	z-index:1;
+	width:100%;
+	height:1.2em;
+	text-align:center;
+	background-color: rgba(0,0,0,0.3);
+	text-overflow: ellipsis;
 }
 .progress-box .amount {
-    position: absolute;
-    z-index:1;
-    width: 100%;
-    height:1.2em;
-    text-align: center;
-    bottom: 0.05em;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	position: absolute;
+	z-index:1;
+	width: 100%;
+	height:1.2em;
+	text-align: center;
+	bottom: 0.05em;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .progress-horizontal {
 	font-size:0.85em;
-    height: 4em;
-    max-width: 30em;
-    background-color: rgb(65,65,65);
-    border: 1px solid rgb(0,0,0);
-    position: relative;
-    margin: 0.25em auto;
-    overflow: hidden;
+	height: 4em;
+	max-width: 30em;
+	background-color: rgb(65,65,65);
+	border: 1px solid rgb(0,0,0);
+	position: relative;
+	margin: 0.25em auto;
+	overflow: hidden;
 }
 .progress-horizontal .progress-bar-container {
 	position: absolute;
@@ -261,37 +261,37 @@ a {
 	background-color: rgba(85,85,85,1);
 }
 .progress-bar-container .progress-bar {
-    position: absolute;
-    z-index:1;
-    left: 0;
-    height: 100%;
-    background-color: rgba(93,164,105,0.5);
+	position: absolute;
+	z-index:1;
+	left: 0;
+	height: 100%;
+	background-color: rgba(93,164,105,0.5);
 }
 .progress-horizontal .icon {
-    position: absolute;
-    z-index:1;
-    top:0.5em;
-    left:0.5em;
-    width:3em;
-    height:3em;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+	position: absolute;
+	z-index:1;
+	top:0.5em;
+	left:0.5em;
+	width:3em;
+	height:3em;
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 }
 .progress-horizontal .title {
-    position: absolute;
-    z-index:1;
-    height:1.2em;
-    text-align: center;
-    left: 5em;
-    top: 0.1em;
+	position: absolute;
+	z-index:1;
+	height:1.2em;
+	text-align: center;
+	left: 5em;
+	top: 0.1em;
 }
 .progress-horizontal .amount {
-    position: absolute;
-    z-index:1;
-    top:0.1em;
-    right:0.5em;
-    height:1.5em;
+	position: absolute;
+	z-index:1;
+	top:0.1em;
+	right:0.5em;
+	height:1.5em;
 }
 .gunsmith .icon {
 	background-image: url("/icons/gunsmith.png");
@@ -312,34 +312,34 @@ a {
 	background-image: url("/icons/cruciblemark.png");
 }
 .crucible .icon {
-    background-image: url("/icons/crucible.png");
+	background-image: url("/icons/crucible.png");
 }
 .future-war-cult .icon {
-    background-image: url("/icons/futurewarcult.png");
+	background-image: url("/icons/futurewarcult.png");
 }
 .crotas-bane .icon {
-    background-image: url("/icons/erismorn.png");
+	background-image: url("/icons/erismorn.png");
 }
 .queens-wrath .icon {
-    background-image: url("/icons/queen.png");
+	background-image: url("/icons/queen.png");
 }
 .house-of-judgment .icon {
 	background-image: url("/icons/houseofjudgment.png");
 }
 .cryptarch .icon {
-    background-image: url("/icons/cryptarch.png");
+	background-image: url("/icons/cryptarch.png");
 }
 .iron-banner .icon {
-    background-image: url("/icons/ironbanner.png");
+	background-image: url("/icons/ironbanner.png");
 }
 .dead-orbit .icon {
-    background-image: url("/icons/deadorbit.png");
+	background-image: url("/icons/deadorbit.png");
 }
 .vanguard .icon {
-    background-image: url("/icons/vanguard.png");
+	background-image: url("/icons/vanguard.png");
 }
 .new-monarchy .icon {
-    background-image: url("/icons/newmonarchy.png");
+	background-image: url("/icons/newmonarchy.png");
 }
 .raid .icon {
 	background-image: url("/icons/raid.png");
@@ -413,4 +413,43 @@ a {
 }
 .change-style-div {
 	height: 0.5em;
+}
+.big-icon-button {
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: left;
+	width: 20em;
+	height: 5.5em;
+	border: 1px solid #000;
+	border-radius: 3px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
+	margin: 1em;
+	padding-left: 6em;
+	padding-top: 0.7em;
+	cursor: pointer;
+	background-color: #393939;
+}
+.big-icon-button:hover {
+	background-color: #494949;
+}
+.big-icon-button .title {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+.big-icon-button .description {
+	font-size: 0.9em;
+}
+.used-3oc-button {
+	background-image: url('/icons/3oc.jpg');
+}
+.no-exotic-button {
+	background-image: url('/icons/sorrow.jpg');
+}
+.exotic-dropped-button {
+	background-image: url('/icons/carlton.jpg');
+}
+.event-buttons .last {
+	font-size: 0.8em;
+	color: rgb(93,164,105);
+	font-weight: bold;
 }
