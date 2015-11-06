@@ -97,7 +97,7 @@ function logCoinsEvent(req, res) {
 			finish();
 			return;
 		}
-		//dbHandler.insertOne('threeOfCoinsEvents', eventLog, finish);
+		dbHandler.insert('threeOfCoinsEvents', eventLog, finish);
 	}
 
 	function finish() {
@@ -523,8 +523,8 @@ function DatabaseConnectionHandler() {
 		}
 	};
 
-	self.insertOne = function(collection, data, callback) {
-		self.db.collection(collection).insertOne(data, callback);
+	self.insert = function(collection, data, callback) {
+		self.db.collection(collection).insert(data, callback);
 	};
 
 	self.upsert = function(collection, condition, data, callback) {
