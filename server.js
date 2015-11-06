@@ -97,7 +97,7 @@ function logCoinsEvent(req, res) {
 			finish();
 			return;
 		}
-		dbHandler.insertOne('threeOfCoinsEvents', eventLog, finish);
+		//dbHandler.insertOne('threeOfCoinsEvents', eventLog, finish);
 	}
 
 	function finish() {
