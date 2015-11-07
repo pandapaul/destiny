@@ -448,6 +448,9 @@ a {
 .exotic-dropped-button {
 	background-image: url('/icons/carlton.jpg');
 }
+.event-buttons {
+	display: inline-block;
+}
 .event-buttons .last {
 	font-size: 0.8em;
 	color: rgb(93,164,105);
@@ -459,4 +462,35 @@ a {
 	background-color: #1e1e1e;
 	border: 1px solid #000;
 	border-radius: 3px;
+}
+.local-log {
+	display: inline-block;
+	border: 1px solid #000;
+	border-radius: 3px;
+	padding: 1em;
+	max-width: 19em;
+	width: 100%;
+	vertical-align: top;
+	margin: 1em auto;
+	height: 18.5em;
+	background-color: #292929;
+}
+.local-log-header {
+	font-size: 0.8em;
+	color: #aaa;
+	font-weight: bold;
+}
+.local-log-events {
+	font-size: 0.8em;
+	max-height: 19.5em;
+	overflow-y: auto;
+}
+.local-log-events .zebra {
+	background-color: #333;
+}
+.local-log-events .exoticDropped {
+	color: rgb(206, 174, 50);
+}
+.local-log-item {
+	margin: 0.25em;
 }

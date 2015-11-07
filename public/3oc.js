@@ -9,6 +9,13 @@ $(function() {
 		lastNoExoticTimestamp,
 		lastExoticDropped = exoticDroppedButton.find('.last'),
 		lastExoticDroppedTimestamp,
+		localLogEvents = $('.local-log-events'),
+		zebraLog = false,
+		events = {
+			'3oc': 'Used 3oC',
+			'noExotic': 'No drop',
+			'exoticDropped': 'Exotic dropped'
+		},
 		sessionId;
 
 	function submitEvent(type) {
@@ -28,23 +35,32 @@ $(function() {
 
 	function setupButtonHandling() {
 		coinsButton.on('click', function () {
-			submitEvent('3oc').done(function (res) {
-				lastCoinsTimestamp = moment();
-				updateTimestamps();
-			});
+			lastCoinsTimestamp = moment();
+			updateTimestamps();
+			localLog('3oc', lastCoinsTimestamp);
+			submitEvent('3oc');
 		});
 		noExoticButton.on('click', function () {
-			submitEvent('noExotic').done(function (res) {
-				lastNoExoticTimestamp = moment();
-				updateTimestamps();
-			});
+			lastNoExoticTimestamp = moment();
+			updateTimestamps();
+			localLog('noExotic', lastNoExoticTimestamp);
+			submitEvent('noExotic');
 		});
 		exoticDroppedButton.on('click', function () {
-			submitEvent('exoticDropped').done(function (res) {
-				lastExoticDroppedTimestamp = moment();
-				updateTimestamps();
-			});
+			lastExoticDroppedTimestamp = moment();
+			updateTimestamps();
+			localLog('exoticDropped', lastExoticDroppedTimestamp);
+			submitEvent('exoticDropped');
 		});
+	}
+
+	function localLog(eventType, timestamp) {
+		var localLogItem = $('<div/>').text((events[eventType] || 'Unknown event') + ' at ' + timestamp.format('H:mm'));
+		localLogItem.toggleClass('zebra', zebraLog);
+		localLogItem.addClass(eventType);
+		localLogItem.addClass('local-log-item');
+		localLogItem.prependTo(localLogEvents);
+		zebraLog = !zebraLog;
 	}
 
 	function updateTimestamps() {
