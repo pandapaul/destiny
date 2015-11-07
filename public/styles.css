@@ -458,11 +458,18 @@ a {
 	font-weight: bold;
 }
 .coins-instructions {
-	font-size: 0.9em;
+	font-size: 0.8em;
 	padding: 1em;
 	background-color: #1e1e1e;
 	border: 1px solid #000;
 	border-radius: 3px;
+	color: #ccc;
+}
+.coins-instructions .main-instructions {
+	font-weight: bold;
+}
+.coins-instructions .sub-instructions {
+
 }
 .local-log {
 	display: inline-block;
