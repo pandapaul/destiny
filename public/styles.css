@@ -418,14 +418,15 @@ a {
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: left;
-	width: 20em;
+	max-width: 20em;
 	height: 5.5em;
 	border: 1px solid #000;
 	border-radius: 3px;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
 	margin: 1em auto;
 	padding-left: 6em;
-	padding-top: 0.7em;
+	padding-top: 0.25em;
+	padding-right: 0.5em;
 	cursor: pointer;
 	background-color: #393939;
 }
@@ -468,7 +469,7 @@ a {
 	border: 1px solid #000;
 	border-radius: 3px;
 	padding: 1em;
-	max-width: 19em;
+	max-width: 19.75em;
 	width: 100%;
 	vertical-align: top;
 	margin: 1em auto;
