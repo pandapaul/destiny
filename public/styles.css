@@ -423,7 +423,7 @@ a {
 	border: 1px solid #000;
 	border-radius: 3px;
 	box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
-	margin: 1em;
+	margin: 1em auto;
 	padding-left: 6em;
 	padding-top: 0.7em;
 	cursor: pointer;
@@ -452,4 +452,11 @@ a {
 	font-size: 0.8em;
 	color: rgb(93,164,105);
 	font-weight: bold;
+}
+.coins-instructions {
+	font-size: 0.9em;
+	padding: 1em;
+	background-color: #1e1e1e;
+	border: 1px solid #000;
+	border-radius: 3px;
 }
