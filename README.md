@@ -3,7 +3,7 @@ Destiny Reputation Search
 
 Description
 -------------
-This project was the starting point for DestinyRep.com. At this point, both the server and front-end have been completely rewritten, but the core ideas are still the same. Connect to Bungie.net's API, gather character data starting with just a simple username search, & display it in a clear, simple fashion. 
+This is the source for DestinyRep.com.  The node service is responsible for handling API calls and serving up static files.
 
 Related (& Awesome) Projects
 ----------------------------
@@ -14,7 +14,7 @@ Install & Run
 -------------
 ```
 npm install
-node server.js
+npm start
 ```
 
 Contributing
