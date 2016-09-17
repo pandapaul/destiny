@@ -16,6 +16,10 @@ Contributing
 -------------
 Send pull requests to the [github repo](https://github.com/pandapaul/destiny)
 
+License
+-------------
+MIT
+
 Related (& Awesome) Projects
 ----------------------------
 * https://github.com/SargoDarya/bungie-platform - If you need to know what end points Bungie offers, this is where you should look.
