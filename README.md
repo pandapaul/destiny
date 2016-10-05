@@ -11,7 +11,7 @@ npm start
 
 Contributing
 -------------
-Send pull requests to the [github repo](https://github.com/pandapaul/destiny)
+Submit pull requests against the master branch.
 
 License
 --------
