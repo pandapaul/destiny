@@ -246,7 +246,7 @@ function Searcher(username, membershipType, justChecking) {
 				if (currencies[i].itemHash === 2749350776) {
 					continue;
 				}
-				
+
 				inventory.currencies[currencies[i].itemHash] = {
 					value: currencies[i].value
 				};
@@ -508,7 +508,7 @@ function DatabaseConnectionHandler() {
 	var self = this;
 
 	self.connect = function(callback) {
-		mongo.MongoClient.connect(process.env.MONGOLAB_URI, function(err, db) {
+		mongo.MongoClient.connect(process.env.MONGODB_URI, function(err, db) {
 			self.db = db;
 			if(err) {
 				console.log(err);
