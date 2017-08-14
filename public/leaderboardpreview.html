@@ -56,12 +56,12 @@
 
 	<div class="container clearfix">
 		<select class="leaderboard-select form-control">
-			
+
 		</select>
 	</div>
 
 	<div class="container results">
-		
+
 	</div>
 
 	<script>
@@ -70,6 +70,7 @@
 			var factions = {
 				529303302: 'Cryptarch',
 				3233510749: 'Vanguard',
+				2335631936: 'Gunsmith',
 				1357277120: 'Crucible',
 				3871980777: 'New Monarchy',
 				2778795080: 'Dead Orbit',
@@ -97,7 +98,7 @@
 				container.text('loading...');
 				selectedFaction = selector.val();
 				$.ajax({
-					url: '/leaderboard', 
+					url: '/leaderboard',
 					type: 'POST',
 					data: JSON.stringify({faction: selectedFaction}),
 					contentType:'application/json; charset=utf-8',
